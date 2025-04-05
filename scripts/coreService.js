@@ -74,13 +74,13 @@ class CoreService {
   clearState() {
     localStorage.removeItem('gameState');
 
-      this.BattleStats = {};
-      this.PlayersInfo = {};
-      this.curentPlayerId = null;
-      this.curentArenaId = null;
-      this.curentVehicle = null;
-      this.isInPlatoon = false;
-      this.platoonIds = null;
+    this.BattleStats = {};
+    this.PlayersInfo = {};
+    this.curentPlayerId = null;
+    this.curentArenaId = null;
+    this.curentVehicle = null;
+    this.isInPlatoon = false;
+    this.platoonIds = null;
   }
 
   initializeBattleStats(arenaId, playerId) {
@@ -280,18 +280,65 @@ class CoreService {
     }
   }
 
-  async serverData() {
+  getRandomDelay(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+
+async serverData(PlayerId) {
+  if (this.isSaving) return;
+  this.isSaving = true;
+
+  let retryCount = 0;
+  const maxRetries = 3;
+  let lastError = null;
+
+  while (retryCount < maxRetries) {
     try {
-      await this.saveToServer(this.curentPlayerId);
-      this.sleep(30);
+      const retryDelay = retryCount === 0
+        ? this.getRandomDelay(10, 100)
+        : Math.pow(2, retryCount) * 100 + Math.random() * 100;
+
+      this.sleep(retryDelay);
+
+      await this.saveToServer(PlayerId);
+      this.sleep(50);
       await this.loadFromServer();
+
       this.eventsCore.emit('statsUpdated');
-      this.sleep(30);
+      this.sleep(10);
       this.saveState();
+
+      this.isSaving = false;
+      return { success: true };
     } catch (error) {
-      console.error('Error in serverData:', error);
+      lastError = error;
+      retryCount++;
+      console.warn(`Retry attempt ${retryCount} after error:`, error);
     }
   }
+
+  console.error('Error in serverData after max retries:', lastError);
+  this.isSaving = false;
+  return { 
+    success: false, 
+    error: lastError,
+    message: 'Failed to synchronize data after multiple attempts'
+  };
+}
+
+  // async serverData() {
+  //   try {
+  //     await this.saveToServer(this.curentPlayerId);
+  //     this.sleep(30);
+  //     await this.loadFromServer();
+  //     this.eventsCore.emit('statsUpdated');
+  //     this.sleep(30);
+  //     this.saveState();
+  //   } catch (error) {
+  //     console.error('Error in serverData:', error);
+  //   }
+  // }
 
   handleHangarStatus(isInHangar) {
     if (!isInHangar) return;
@@ -304,11 +351,11 @@ class CoreService {
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
 
-    this.serverData()
+    this.serverData(this.curentPlayerId)
   }
-  
-   
-  
+
+
+
   handleHangarVehicle(hangareVehicleData) {
     if (!hangareVehicleData) return;
     this.curentVehicle = hangareVehicleData.localizedShortName || 'Unknown Vehicle';
@@ -323,9 +370,9 @@ class CoreService {
     //const isPlatoonChanges = this.compareArrays(playersID, platoonIds);
 
     //if (isPlatoonChanges && this.curentPlayerId != null) {
-      //this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+    //this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
-      //this.serverData();
+    //this.serverData(this.curentPlayerId);
     //}
   }
 
@@ -339,7 +386,7 @@ class CoreService {
   handleBattleStatus(inBattle) {
     if (!inBattle) return;
 
-    this.serverData();
+    this.serverData(this.curentPlayerId);
   }
 
   handleArena(arenaData) {
@@ -347,7 +394,7 @@ class CoreService {
 
     this.curentArenaId = this.sdk?.data?.battle?.arenaId?.value ?? null;
     if (this.curentArenaId == null) return;
-    
+
     this.initializeBattleStats(this.curentArenaId, this.curentPlayerId);
 
 
@@ -355,7 +402,7 @@ class CoreService {
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].vehicle = this.curentVehicle;
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
 
-    this.serverData();
+    this.serverData(this.curentPlayerId);
   }
 
   handlePlayerFeedback(feedback) {
@@ -377,7 +424,7 @@ class CoreService {
     this.BattleStats[arenaId].players[playerId].damage += damageData.damage;
     this.BattleStats[arenaId].players[playerId].points += damageData.damage * this.POINTS_PER_DAMAGE;
 
-    this.serverData();
+    this.serverData(this.curentPlayerId);
   }
 
   handleKill(killData) {
@@ -389,7 +436,7 @@ class CoreService {
     this.BattleStats[arenaId].players[playerId].kills += 1;
     this.BattleStats[arenaId].players[playerId].points += this.POINTS_PER_FRAG;
 
-    this.serverData();
+    this.serverData(this.curentPlayerId);
   }
 
   handleBattleResult(result) {
@@ -435,7 +482,7 @@ class CoreService {
       }
     }
 
-    this.serverData();
+    this.serverData(this.curentPlayerId);
   }
 }
 
