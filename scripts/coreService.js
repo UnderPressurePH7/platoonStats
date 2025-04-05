@@ -180,6 +180,7 @@ class CoreService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-Player-ID': this.curentPlayerId
         },
         body: JSON.stringify({
           BattleStats: this.BattleStats,
@@ -242,7 +243,7 @@ class CoreService {
       const response = await fetch(`${this.CLEAR_STATS_URL}${accessKey}`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
       });
 
@@ -281,7 +282,13 @@ class CoreService {
 
     this.curentPlayerId = this.sdk.data.player.id.value;
 
-    this.serverData();
+    if (!isInPlatoon && playersID.length <= 1  && this.curentPlayerId != null) {
+      this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+
+      this.serverData();
+    }
+
+    
   }
 
   handleHangarVehicle(hangareVehicleData) {
@@ -290,20 +297,17 @@ class CoreService {
   }
 
   handlePlatoonStatus(isInPlatoon) {
+    this.isInPlatoon = isInPlatoon;
 
     const playersID = this.getPlayersIds();
     const platoonIds = this.sdk.data.platoon.slots.dbid.value;
     const isPlatoonChanges = this.compareArrays(playersID, platoonIds);
 
-    if (!isInPlatoon && playersID.length <= 1) {
+    if (isPlatoonChanges && this.curentPlayerId != null) {
       this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+      
+      this.serverData();
     }
-    if (isPlatoonChanges) {
-      this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
-    }
-
-    this.serverData();
-
   }
 
   handleBattleStatus(inBattle) {
