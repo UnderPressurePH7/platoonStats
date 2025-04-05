@@ -35,9 +35,7 @@ class CoreService {
       this.curentVehicle = null;
       this.platoonIds = null;
     }
-    this.isSaving = false;
 
-    // Initialize
     this.setupSDKListeners();
     this.eventsCore = new EventEmitter();
     this.loadFromServer();
@@ -188,7 +186,6 @@ class CoreService {
 
   async saveToServer() {
     try {
-      // Відправляємо дані на сервер
       const response = await fetch(`${this.BATTLE_STATS_URL}${this.getAccessKey()}`, {
         method: 'POST',
         headers: {
@@ -201,16 +198,13 @@ class CoreService {
         }),
       });
   
-      // Перевіряємо статус відповіді
       if (!response.ok && response.status !== 202) {
         throw new Error(`Помилка при збереженні даних: ${response.statusText}`);
       }
   
-      // Завантажуємо дані з сервера
-      await this.sleep(300); // Даємо серверу час на обробку
+      await this.sleep(300); 
       await this.loadFromServer();
   
-      // Оновлюємо UI та зберігаємо локально
       this.eventsCore.emit('statsUpdated');
       this.saveState();
   
@@ -220,41 +214,6 @@ class CoreService {
       return false;
     }
   }
-
-  // async saveToServer(playerId) {
-  //   if (this.isSaving) return;
-  //   this.isSaving = true;
-
-  //   try {
-  //     const accessKey = this.getAccessKey();
-  //     const response = await fetch(`${this.BATTLE_STATS_URL}${accessKey}`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'X-Player-ID': playerId
-  //       },
-  //       body: JSON.stringify({
-  //         BattleStats: this.BattleStats,
-  //         PlayerInfo: this.PlayersInfo,
-  //       }),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error(`Помилка при збереженні даних: ${response.statusText}`);
-  //     }
-
-  //     const data = await response.json();
-  //     if (!data.success) {
-  //       throw new Error(data.message || 'Помилка при збереженні даних');
-  //     }
-
-  //   } catch (error) {
-  //     console.error('Помилка при збереженні даних на сервер:', error);
-  //     throw error;
-  //   } finally {
-  //     this.isSaving = false;
-  //   }
-  // }
 
   async loadFromServer() {
     try {
@@ -332,52 +291,6 @@ class CoreService {
     }
   }
 
-  // async serverData() {
-  //   if (this.isSaving) return;
-  //   this.isSaving = true;
-
-  //   try {
-  //     let retryCount = 0;
-  //     const maxRetries = 4;
-  //     let lastError = null;
-
-  //     while (retryCount < maxRetries) {
-  //       try {
-  //         const retryDelay = retryCount === 0
-  //           ? this.getRandomDelay(10, 100)
-  //           : Math.pow(2, retryCount) * 100 + Math.random() * 100;
-
-  //         await this.sleep(retryDelay);
-  //         await this.saveToServer(this.curentPlayerId);
-  //         await this.sleep(50);
-  //         await this.loadFromServer();
-  //         await this.sleep(50);
-  //         this.eventsCore.emit('statsUpdated');
-  //         await this.sleep(10);
-  //         this.saveState();
-
-  //         return { success: true };
-  //       } catch (error) {
-  //         lastError = error;
-  //         retryCount++;
-  //         console.warn(`Retry attempt ${retryCount} after error:`, error);
-
-  //         if (retryCount === maxRetries) {
-  //           throw lastError; // Прокидуємо помилку після всіх спроб
-  //         }
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error('Error in serverData:', error);
-  //     return { 
-  //       success: false, 
-  //       error: error,
-  //       message: 'Failed to synchronize data'
-  //     };
-  //   } finally {
-  //     this.isSaving = false;
-  //   }
-  // }
 
   handleHangarStatus(isInHangar) {
     if (!isInHangar) return;
