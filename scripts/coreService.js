@@ -88,7 +88,7 @@ class CoreService {
       this.BattleStats[arenaId] = {
         startTime: Date.now(),
         duration: 0,
-        win: -2,
+        win: -1,
         mapName: 'Unknown Map',
         players: {}
       };
@@ -337,12 +337,7 @@ class CoreService {
   handleBattleStatus(inBattle) {
     if (!inBattle) return;
 
-    if (this.curentArenaId) {
-      this.BattleStats[this.curentArenaId].startTime = Date.now();
-      this.BattleStats[this.curentArenaId].win = -1;
-    }
-
-    this.serverData();
+    his.serverData();
   }
 
   handleArena(arenaData) {
