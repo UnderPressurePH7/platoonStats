@@ -156,7 +156,7 @@ class BattleUIHandler {
         let resultText = 'inBattle';
         let resultClass = 'unknown';
         
-        const battleResult = Number(battle.win || -1);
+        const battleResult = Number(battle.win);
 
         if (battleResult === -1) {
             resultClass = 'inBattle';
