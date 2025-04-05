@@ -110,7 +110,11 @@ class CoreService {
   getPlayersIds() {
     return Object.keys(this.PlayersInfo);
   }
-
+  
+  getCurentPlayerIndex() {
+    return this.getPlayersIds().indexOf(this.curentPlayerId);
+  }
+  
   compareArrays(arr1, arr2) {
     if (!Array.isArray(arr1) || !Array.isArray(arr2)) {
       return false;
@@ -338,7 +342,11 @@ class CoreService {
   handleBattleStatus(inBattle) {
     if (!inBattle) return;
 
-    // this.serverData();
+      const playerIds = this.getPlayersIds();
+      const index = this.getCurentPlayerIndex();
+    if (this.curentPlayerId === null ) {
+       this.curentPlayerId = playerIds[index];
+    }
   }
 
   handleArena(arenaData) {
@@ -417,7 +425,7 @@ class CoreService {
     }
 
     const playerIds = this.getPlayersIds();
-    const index = this.getPlayersIds().indexOf(this.curentPlayerId);
+    const index = this.getCurentPlayerIndex();
     for (const playerId of playerIds) {
       for (const vehicleId in result.vehicles) {
         const vehicles = result.vehicles[vehicleId];
