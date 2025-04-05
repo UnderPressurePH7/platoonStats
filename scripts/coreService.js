@@ -298,43 +298,15 @@ class CoreService {
 
     const playersID = this.getPlayersIds();
     this.curentPlayerId = this.sdk.data.player.id.value;
-  
-    if (!this.isInPlatoon && playersID.length <= 1 && this.curentPlayerId != null) {
-      this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
-      
-      this.serverData();
-      return;
-    } 
+
+    if (playersID.length >= 1 && !this.isInPlatoon) return;
     
-      if (this.isInPlatoon && this.curentPlayerId != null && playersID.length <= 3 ) {
-      this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
-      this.serverData();
-      return ;
-    }
+    this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+
+    this.serverData()
   }
-
-//   handleHangarStatus(isInHangar) {
-//   if (!isInHangar) return false; 
-
-//   const playersID = this.getPlayersIds();
-//   if (!playersID) return false;
-
-//   const curentPlayerId = this.sdk.data.player?.id?.value;
-//   if (curentPlayerId == null) return false;
-
-//   const isValidTeamSize = !this.isInPlatoon ? 
-//     playersID.length <= 1 : 
-//     playersID.length <= 3;
-
-//   if (isValidTeamSize) {
-//     this.playersInfo[curentPlayerId] = this.sdk.data.player?.name?.value;
-//     this.serverData();
-//     return true;
-//   }
-
-//   return false; 
-// }
-
+  
+   
   
   handleHangarVehicle(hangareVehicleData) {
     if (!hangareVehicleData) return;
@@ -454,8 +426,8 @@ class CoreService {
             playerStats.damage = vehicle.damageDealt;
             playerStats.kills = vehicle.kills;
             playerStats.points = vehicle.damageDealt + (vehicle.kills * this.POINTS_PER_FRAG);
-            this.saveToServer(playerId);
-            this.sleep(10);
+            // this.saveToServer(playerId); // помилка, сервер лягає
+            // this.sleep(10);
             break;
           }
         }
