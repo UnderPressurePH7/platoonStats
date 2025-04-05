@@ -16,17 +16,12 @@ class BattleUIHandler {
         
         // ВИПРАВЛЕННЯ: Додали обробник події видалення бою, щоб оновлювати інтерфейс
         this.dataManager.eventsHistory.on('battleDeleted', (battleId) => {
-            // Видаляємо бій з локальних даних
-            if (this.dataManager.BattleStats[battleId]) {
-                delete this.dataManager.BattleStats[battleId];
+
                 // Оновлюємо інтерфейс, щоб відобразити видалення
                 this.updateBattleTable();
                 this.updateStats();
                 this.setupFilters();
 
-                this.dataManager.saveState();
-                this.dataManager.saveToServer();
-            }
         });
     }
 

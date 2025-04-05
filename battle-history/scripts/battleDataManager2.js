@@ -6,7 +6,7 @@ class BattleDataManager {
     this.POINTS_PER_FRAG = 400;
     this.POINTS_PER_TEAM_WIN = 2000;
     this.BATTLE_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/";
-    
+
     const savedState = localStorage.getItem('gameState');
     if (savedState) {
       const state = JSON.parse(savedState);
@@ -46,7 +46,7 @@ class BattleDataManager {
     let battleDamage = 0;
     let battleKills = 0;
     battle.win == 1 ? battlePoints += this.POINTS_PER_TEAM_WIN : battlePoints += 0;
-    
+
     if (battle && battle.players) {
       Object.values(battle.players).forEach(player => {
         battlePoints += player.points || 0;
@@ -149,13 +149,17 @@ class BattleDataManager {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-        }   
+        }
       });
-     
+
       if (!response.ok) {
         throw new Error(`Помилка при очищенні даних: ${response.statusText}`);
       }
-
+      // Видаляємо бій з локальних даних
+      if (this.BattleStats[battleId]) {
+        delete this.BattleStats[battleId];
+        this.saveState(); // Зберігаємо зміни в локальному сховищі
+      }
       const data = await response.json();
       this.eventsHistory.emit('battleDeleted', battleId);
       return true;
@@ -172,7 +176,7 @@ class BattleDataManager {
 
     // Фільтруємо за мапою
     if (filters.map) {
-      filteredBattles = filteredBattles.filter(battle => 
+      filteredBattles = filteredBattles.filter(battle =>
         battle.mapName === filters.map
       );
     }
@@ -181,7 +185,7 @@ class BattleDataManager {
     if (filters.vehicle) {
       filteredBattles = filteredBattles.filter(battle => {
         if (!battle.players) return false;
-        return Object.values(battle.players).some(player => 
+        return Object.values(battle.players).some(player =>
           player.vehicle === filters.vehicle
         );
       });
@@ -207,13 +211,13 @@ class BattleDataManager {
     if (filters.date) {
       const filterDate = new Date(filters.date);
       filterDate.setHours(0, 0, 0, 0);
-      
+
       filteredBattles = filteredBattles.filter(battle => {
         if (!battle.startTime) return false;
-        
+
         const battleDate = new Date(battle.startTime);
         battleDate.setHours(0, 0, 0, 0);
-        
+
         return battleDate.getTime() === filterDate.getTime();
       });
     }
@@ -222,8 +226,8 @@ class BattleDataManager {
     if (filters.player) {
       filteredBattles = filteredBattles.filter(battle => {
         if (!battle.players) return false;
-        
-        return Object.values(battle.players).some(player => 
+
+        return Object.values(battle.players).some(player =>
           player.name === filters.player
         );
       });
@@ -231,10 +235,10 @@ class BattleDataManager {
 
     // Зберігаємо відфільтровані бої
     this.filteredBattles = filteredBattles;
-    
+
     // Сповіщаємо про застосування фільтрів
     this.eventsHistory.emit('filtersApplied', this.filteredBattles);
-    
+
     return this.filteredBattles;
   }
 
@@ -247,7 +251,7 @@ class BattleDataManager {
     }
   }
 
-  
+
   async importData(importedData) {
     try {
       if (!importedData || typeof importedData !== 'object') {
