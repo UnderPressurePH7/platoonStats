@@ -126,8 +126,13 @@ class UIService {
     if (refreshBtn) {
       refreshBtn.addEventListener('click', () => {
         if (confirm('Оновити відображення даних?')) {
-          this.updatePlayersUI()
-          alert('Відображення оновленно!');
+          this.core.loadFromServer().then(() => {
+            this.updatePlayersUI();
+            alert('Дані оновлено!');
+          }).catch(error => {
+            console.error('Помилка при оновленні даних:', error);
+            alert('Помилка при оновленні даних або історія боїв порожня.');
+          });
         }
       });
     }
