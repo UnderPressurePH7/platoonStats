@@ -3,11 +3,6 @@ import BattleUIHandler from './battleUIHandler.js';
 
 class MainHistory {
     constructor() {
-        if (!this.checkAccessKey()) {
-            this.showAccessDenied();
-            return;
-        }
-
         this.init();
     }
 
@@ -19,7 +14,6 @@ class MainHistory {
                 return;
             }
             this.initializeServices();
-            this.initialized = true;
         } catch (error) {
             console.error('Error in init:', error);
             this.showAccessDenied();

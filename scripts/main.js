@@ -3,11 +3,6 @@ import UIService from './uiService.js';
 
 export default class SquadWidget {
   constructor() {
-    if (!this.checkAccessKey()) {
-      this.showAccessDenied();
-      return;
-    }
-
     this.init();
   }
 
@@ -19,7 +14,6 @@ export default class SquadWidget {
         return;
       }
       this.initializeServices();
-      this.initialized = true;
     } catch (error) {
       console.error('Error in init:', error);
       this.showAccessDenied();
