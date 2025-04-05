@@ -31,6 +31,7 @@ export default class SquadWidget {
   }
   async checkAccessKey() {
     try {
+      localStorage.removeItem('accessKey');
       const urlParams = window.location.search.substring(1);
       
       if (!urlParams) {
