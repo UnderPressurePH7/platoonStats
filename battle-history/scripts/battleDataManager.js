@@ -304,9 +304,10 @@ class BattleDataManager {
         throw new Error('Failed to save data to server');
       }
 
-      this.clearState();
-      await this.loadFromServer();
       
+      await this.loadFromServer();
+      this.saveState();
+
       this.eventsHistory.emit('dataImported', importedData);
       return true;
 
