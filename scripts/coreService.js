@@ -293,23 +293,51 @@ class CoreService {
     }
   }
 
-  handleHangarStatus(isInHangar) {
-    if (!isInHangar) return;
+  // handleHangarStatus(isInHangar) {
+  //   if (!isInHangar) return;
 
-    const playersID = this.getPlayersIds();
-    this.curentPlayerId = this.sdk.data.player.id.value;
+  //   const playersID = this.getPlayersIds();
+  //   this.curentPlayerId = this.sdk.data.player.id.value;
   
-    if (!this.isInPlatoon && playersID.length <= 1 && this.curentPlayerId != null) {
-      this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+  //   if (!this.isInPlatoon && playersID.length <= 1 && this.curentPlayerId != null) {
+  //     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
       
-      this.serverData();
-    } else if (this.isInPlatoon && this.curentPlayerId != null) {
-      this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+  //     this.serverData();
+  //     return true;
+  //   } 
+    
+  //     if (this.isInPlatoon && this.curentPlayerId != null && playersID.length <= 3 ) {
+  //     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
-      this.serverData();
-    }
+  //     this.serverData();
+
+  //     return true;
+  //   }
+  // }
+
+  handleHangarStatus(isInHangar) {
+  if (!isInHangar) return false; 
+
+  const playersID = this.getPlayersIds();
+  if (!playersID) return false;
+
+  const curentPlayerId = this.sdk.data.player?.id?.value;
+  if (curentPlayerId == null) return false;
+
+  const isValidTeamSize = !this.isInPlatoon ? 
+    playersID.length <= 1 : 
+    playersID.length <= 3;
+
+  if (isValidTeamSize) {
+    this.playersInfo[curentPlayerId] = this.sdk.data.player?.name?.value;
+    this.serverData();
+    return true;
   }
 
+  return false; 
+}
+
+  
   handleHangarVehicle(hangareVehicleData) {
     if (!hangareVehicleData) return;
     this.curentVehicle = hangareVehicleData.localizedShortName || 'Unknown Vehicle';
