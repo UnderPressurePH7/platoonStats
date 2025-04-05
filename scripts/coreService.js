@@ -32,10 +32,9 @@ class CoreService {
       this.curentPlayerId = null;
       this.curentArenaId = null;
       this.curentVehicle = null;
-       this.isInPlatoon = null;
     }
     this.isSaving = false;
-  
+
     // Initialize
     this.setupSDKListeners();
     this.eventsCore = new EventEmitter();
@@ -100,22 +99,22 @@ class CoreService {
 
   compareArrays(arr1, arr2) {
     if (!Array.isArray(arr1) || !Array.isArray(arr2)) {
-        return false;
+      return false;
     }
-    
+
     const shorterArr = arr1.length <= arr2.length ? arr1 : arr2;
     const longerArr = arr1.length <= arr2.length ? arr2 : arr1;
-    
+
     let matches = 0;
-    
+
     shorterArr.forEach(element => {
-        if (longerArr.includes(element)) {
-            matches++;
-        }
+      if (longerArr.includes(element)) {
+        matches++;
+      }
     });
-    
+
     return matches === shorterArr.length;
-}
+  }
 
   calculatePlayerData(playerId) {
     let playerPoints = 0;
@@ -279,20 +278,9 @@ class CoreService {
 
   handleHangarStatus(isInHangar) {
     if (!isInHangar) return;
-    this.curentPlayerId = this.sdk.data.player.id.value;
-  
-    this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
-    // const playersID = this.getPlayersIds();
-    // const platoonIds = this.sdk.data.platoon.slots.dbid;
-    // const isPlatoonChanges = this.compareArrays(playersID, platoonIds);
 
-   // if (playersID.length < 1 ){
-   //  this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
-   // } 
-   // else {
-   //  this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
-   // }
-    
+    this.curentPlayerId = this.sdk.data.player.id.value;
+
     this.serverData();
   }
 
@@ -302,8 +290,20 @@ class CoreService {
   }
 
   handlePlatoonStatus(isInPlatoon) {
-    this.isInPlatoon = isInPlatoon;
-     this.saveState();
+
+    const playersID = this.getPlayersIds();
+    const platoonIds = this.sdk.data.platoon.slots.dbid.value;
+    const isPlatoonChanges = this.compareArrays(playersID, platoonIds);
+
+    if (!isInPlatoon && playersID.length <= 1) {
+      this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+    }
+    if (isPlatoonChanges) {
+      this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+    }
+
+    this.serverData();
+
   }
 
   handleBattleStatus(inBattle) {
