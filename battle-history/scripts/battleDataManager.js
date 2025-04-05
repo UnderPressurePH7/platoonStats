@@ -278,7 +278,7 @@ class BattleDataManager {
         return false;
       }
 
-      
+      await this.loadFromServer();
 
       for (const [arenaId, battleData] of Object.entries(importedData)) {
         if (!battleData || typeof battleData !== 'object') continue;
@@ -304,8 +304,10 @@ class BattleDataManager {
         throw new Error('Failed to save data to server');
       }
 
-      
+      this.clearState();
+      this.sleep(10);
       await this.loadFromServer();
+      this.sleep(10);
       this.saveState();
 
       this.eventsHistory.emit('dataImported', importedData);
