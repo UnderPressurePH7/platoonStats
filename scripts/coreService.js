@@ -341,12 +341,12 @@ class CoreService {
 
   handleBattleStatus(inBattle) {
     if (!inBattle) return;
-
-      const playerIds = this.getPlayersIds();
-      const index = this.getCurentPlayerIndex();
-    if (this.curentPlayerId === null ) {
-       this.curentPlayerId = playerIds[index];
-    }
+    //   const playerIds = this.getPlayersIds();
+    //   const index = this.getCurentPlayerIndex();
+    // if (this.curentPlayerId === null ) {
+    //    this.curentPlayerId = playerIds[index];
+    // }
+    
   }
 
   handleArena(arenaData) {
