@@ -8,8 +8,23 @@ class MainHistory {
             return;
         }
 
-        this.initializeServices();
+        this.init();
     }
+
+    async init() {
+        try {
+          const hasAccess = await this.checkAccessKey();
+          if (!hasAccess) {
+            this.showAccessDenied();
+            return;
+          }
+          this.initializeServices();
+          this.initialized = true;
+        } catch (error) {
+          console.error('Error in init:', error);
+          this.showAccessDenied();
+        }
+      }
 
     initializeServices() {
         try {
@@ -49,7 +64,7 @@ class MainHistory {
             return false;
           }
       
-          const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/${urlParams}`;
+          const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/` + urlParams;
       
           const response = await fetch(apiUrl);
           const data = await response.json();
