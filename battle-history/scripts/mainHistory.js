@@ -13,18 +13,18 @@ class MainHistory {
 
     async init() {
         try {
-          const hasAccess = await this.checkAccessKey();
-          if (!hasAccess) {
-            this.showAccessDenied();
-            return;
-          }
-          this.initializeServices();
-          this.initialized = true;
+            const hasAccess = await this.checkAccessKey();
+            if (!hasAccess) {
+                this.showAccessDenied();
+                return;
+            }
+            this.initializeServices();
+            this.initialized = true;
         } catch (error) {
-          console.error('Error in init:', error);
-          this.showAccessDenied();
+            console.error('Error in init:', error);
+            this.showAccessDenied();
         }
-      }
+    }
 
     initializeServices() {
         try {
@@ -57,33 +57,43 @@ class MainHistory {
 
     async checkAccessKey() {
         try {
-          const urlParams = window.location.search.substring(1);
-          
-          if (!urlParams) {
-            localStorage.removeItem('accessKey');
-            return false;
-          }
-      
-          const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/` + urlParams;
-      
-          const response = await fetch(apiUrl);
-          const data = await response.json();
-    
-          if (data.success === true) {
-            localStorage.setItem('accessKey', urlParams);
-            return true;
-          } else {
-            localStorage.removeItem('accessKey');
-            console.log('Access denied:', data.error);
-            return false;
-          }
-      
+            const urlParams = window.location.search.substring(1);
+
+            if (!urlParams) {
+                localStorage.removeItem('accessKey');
+                return false;
+            }
+
+            const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/` + urlParams;
+
+            const response = await fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Помилка при завантаженні даних: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            if (data.success) {
+                localStorage.setItem('accessKey', urlParams);
+                return true;
+            } else {
+                localStorage.removeItem('accessKey');
+                console.log('Access denied:', data.error);
+                return false;
+            }
+
         } catch (error) {
-          console.error('Error in checkAccessKey:', error);
-          localStorage.removeItem('accessKey');
-          return false;
+            console.error('Error in checkAccessKey:', error);
+            localStorage.removeItem('accessKey');
+            return false;
         }
-      }
+    }
 
     showAccessDenied() {
         try {

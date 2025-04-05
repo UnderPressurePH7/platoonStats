@@ -58,10 +58,22 @@ export default class SquadWidget {
   
       const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/`+ urlParams;
   
-      const response = await fetch(apiUrl);
+
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Помилка при завантаженні даних: ${response.statusText}`);
+      }
+
       const data = await response.json();
 
-      if (data.success === true) {
+
+      if (data.success) {
         localStorage.setItem('accessKey', urlParams);
         return true;
       } else {

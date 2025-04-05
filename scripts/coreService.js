@@ -110,7 +110,7 @@ class CoreService {
   getPlayersIds() {
     return Object.keys(this.PlayersInfo);
   }
-    
+
   compareArrays(arr1, arr2) {
     if (!Array.isArray(arr1) || !Array.isArray(arr2)) {
       return false;
@@ -197,17 +197,17 @@ class CoreService {
           PlayerInfo: this.PlayersInfo,
         }),
       });
-  
+
       if (!response.ok && response.status !== 202) {
         throw new Error(`Помилка при збереженні даних: ${response.statusText}`);
       }
-  
-      await this.sleep(300); 
+
+      await this.sleep(300);
       await this.loadFromServer();
-  
+
       this.eventsCore.emit('statsUpdated');
       this.saveState();
-  
+
       return true;
     } catch (error) {
       console.error('Error in serverData:', error);
@@ -335,7 +335,7 @@ class CoreService {
     if (!arenaData) return;
 
     this.curentArenaId = this.sdk?.data?.battle?.arenaId?.value ?? null;
-    
+
     if (this.curentArenaId == null) return;
     if (this.curentPlayerId == null) return;
 
