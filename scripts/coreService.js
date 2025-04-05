@@ -342,7 +342,7 @@ class CoreService {
   handleBattleStatus(inBattle) {
     if (!inBattle) return;
 
-    his.serverData();
+    this.serverData();
   }
 
   handleArena(arenaData) {
