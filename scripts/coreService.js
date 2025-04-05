@@ -353,7 +353,9 @@ class CoreService {
     if (!arenaData) return;
 
     this.curentArenaId = this.sdk?.data?.battle?.arenaId?.value ?? null;
+    
     if (this.curentArenaId == null) return;
+    if (this.curentPlayerId == null) return;
 
     this.initializeBattleStats(this.curentArenaId, this.curentPlayerId);
 
