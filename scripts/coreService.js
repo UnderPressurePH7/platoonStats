@@ -292,13 +292,13 @@ class CoreService {
   handlePlatoonStatus(isInPlatoon) {
 
     const playersID = this.getPlayersIds();
-    const platoonIds = this.sdk.data.platoon.slots.dbid;
-    const isPlatoonChanges = this.compareArrays(playersID,platoonIds);
+    // const platoonIds = this.sdk.data.platoon.slots.dbid;
+    // const isPlatoonChanges = this.compareArrays(playersID,platoonIds);
 
     if (!isInPlatoon && playersID.length <=1 ){
       this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
     } 
-    if (isPlatoonChanges) {
+    else {
       this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
     }
     
