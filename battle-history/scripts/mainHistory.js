@@ -75,7 +75,7 @@ class MainHistory {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                background-color: #292929;
+                background-color: var(--wotstat-background,rgba(255, 255, 255, 0));
                 z-index: 9999;
             `;
 
@@ -84,8 +84,8 @@ class MainHistory {
                 text-align: center;
                 padding: 2em;
                 border-radius: 1em;
-                background-color: rgba(255, 255, 255, 0);
-                color: #ffffff;
+                background-color: rgba(0, 0, 0, 0.7);
+                color: var(--wotstat-primary, #ffffff);
             `;
 
             message.innerHTML = `
