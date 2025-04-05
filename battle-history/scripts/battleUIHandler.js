@@ -23,6 +23,13 @@ class BattleUIHandler {
                 this.setupFilters();
 
         });
+
+        this.dataManager.eventsHistory.on('dataImported', (importedData) => {
+            this.updateBattleTable();
+            this.updateStats();
+            this.setupFilters();
+        });
+
     }
 
     async initializeUI() {

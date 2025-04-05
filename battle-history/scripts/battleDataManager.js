@@ -298,6 +298,7 @@ class BattleDataManager {
         throw new Error('Failed to save data to server');
       }
 
+      this.eventsHistory.emit('dataImported', importedData);
       return true;
 
     } catch (e) {
