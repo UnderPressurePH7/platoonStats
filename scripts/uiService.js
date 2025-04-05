@@ -194,9 +194,8 @@ class UIService {
           }
     
           await this.core.clearServerData();
-          this.core.BattleStats = {};
-          this.core.PlayersInfo = {};
           
+          this.core.clearState()
           this.updatePlayersUI();
     
           alert('Статистику успішно видалено!');
