@@ -110,15 +110,7 @@ class CoreService {
   getPlayersIds() {
     return Object.keys(this.PlayersInfo);
   }
-  
-//   getCurentPlayerIndex() {
-//   const index = this.getPlayersIds().indexOf(this.currentPlayerId);
-//   if (index === -1) {
-//     throw new Error('Current player not found in players list');
-//   }
-//   return index;
-// }
-  
+    
   compareArrays(arr1, arr2) {
     if (!Array.isArray(arr1) || !Array.isArray(arr2)) {
       return false;
@@ -325,15 +317,6 @@ class CoreService {
     if (!isInPlatoon) return;
     this.isInPlatoon = isInPlatoon;
 
-    //const playersID = this.getPlayersIds();
-    //const platoonIds = this.platoonIds;
-    //const isPlatoonChanges = this.compareArrays(playersID, platoonIds);
-
-    //if (isPlatoonChanges && this.curentPlayerId != null) {
-    //this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
-
-    //this.serverData(this.curentPlayerId);
-    //}
   }
 
   handlePlatoonSlots(slots) {
@@ -345,12 +328,7 @@ class CoreService {
 
   handleBattleStatus(inBattle) {
     if (!inBattle) return;
-    //   const playerIds = this.getPlayersIds();
-    //   const index = this.getCurentPlayerIndex();
-    // if (this.curentPlayerId === null ) {
-    //    this.curentPlayerId = playerIds[index];
-    // }
-    
+
   }
 
   handleArena(arenaData) {
@@ -414,6 +392,7 @@ class CoreService {
     const arenaId = result.arenaUniqueID;
     if (!arenaId) return;
 
+    this.curentPlayerId = Object.keys(result.avatars)[0];
     this.BattleStats[arenaId].duration = result.common.duration;
 
     if (result?.players?.[this.curentPlayerId]?.team !== undefined &&
@@ -431,7 +410,6 @@ class CoreService {
     }
 
     const playerIds = this.getPlayersIds();
-    // const index = this.getPlayersIds().indexOf(this.currentPlayerId);
     for (const playerId of playerIds) {
       for (const vehicleId in result.vehicles) {
         const vehicles = result.vehicles[vehicleId];
@@ -448,7 +426,6 @@ class CoreService {
         }
       }
     }
-    // this.sleep(index * 10 + 20);
     this.serverData();
   }
 }
