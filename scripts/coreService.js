@@ -111,7 +111,7 @@ class CoreService {
     return Object.keys(this.PlayersInfo);
   }
   
-  getCurrentPlayerIndex() {
+  getCurentPlayerIndex() {
   const index = this.getPlayersIds().indexOf(this.currentPlayerId);
   if (index === -1) {
     throw new Error('Current player not found in players list');
