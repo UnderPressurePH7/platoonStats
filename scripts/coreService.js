@@ -417,7 +417,7 @@ class CoreService {
     }
 
     const playerIds = this.getPlayersIds();
-    const index = getPlayersIds().indexOf(this.curentPlayerId);
+    const index = this.getPlayersIds().indexOf(this.curentPlayerId);
     for (const playerId of playerIds) {
       for (const vehicleId in result.vehicles) {
         const vehicles = result.vehicles[vehicleId];
