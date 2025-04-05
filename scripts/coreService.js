@@ -284,9 +284,9 @@ class CoreService {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-  async serverData(PlayerId) {
+  async serverData() {
     try {
-      await this.saveToServer(PlayerId);
+      await this.saveToServer(this.curentPlayerId);
       this.sleep(30);
       await this.loadFromServer();
       this.eventsCore.emit('statsUpdated');
@@ -297,7 +297,7 @@ class CoreService {
     }
   }
 
-// async serverData(PlayerId) {
+// async serverData() {
 //   if (this.isSaving) return;
 //   this.isSaving = true;
 
@@ -313,7 +313,7 @@ class CoreService {
 
 //       this.sleep(retryDelay);
 
-//       await this.saveToServer(PlayerId);
+//       await this.saveToServer(this.curentPlayerId);
 //       this.sleep(50);
 //       await this.loadFromServer();
 //       this.sleep(50);
@@ -350,7 +350,7 @@ class CoreService {
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
 
-    this.serverData(this.sdk.data.player.name.value)
+    this.serverData()
   }
 
 
@@ -385,7 +385,7 @@ class CoreService {
   handleBattleStatus(inBattle) {
     if (!inBattle) return;
 
-    this.serverData(this.curentPlayerId);
+    this.serverData();
   }
 
   handleArena(arenaData) {
@@ -401,7 +401,7 @@ class CoreService {
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].vehicle = this.curentVehicle;
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
 
-    this.serverData(this.curentPlayerId);
+    this.serverData();
   }
 
   handlePlayerFeedback(feedback) {
@@ -423,7 +423,7 @@ class CoreService {
     this.BattleStats[arenaId].players[playerId].damage += damageData.damage;
     this.BattleStats[arenaId].players[playerId].points += damageData.damage * this.POINTS_PER_DAMAGE;
 
-    this.serverData(this.curentPlayerId);
+    this.serverData();
   }
 
   handleKill(killData) {
@@ -435,7 +435,7 @@ class CoreService {
     this.BattleStats[arenaId].players[playerId].kills += 1;
     this.BattleStats[arenaId].players[playerId].points += this.POINTS_PER_FRAG;
 
-    this.serverData(this.curentPlayerId);
+    this.serverData();
   }
 
   handleBattleResult(result) {
@@ -481,7 +481,7 @@ class CoreService {
       }
     }
 
-    this.serverData(this.curentPlayerId);
+    this.serverData();
   }
 }
 
