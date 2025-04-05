@@ -132,9 +132,9 @@ class UIService {
             return;
           }
 
-          if (!confirm('Оновити відображення даних?')) {
-            return;
-          }
+          // if (!confirm('Оновити відображення даних?')) {
+          //   return;
+          // }
 
           isLoading = true;
           refreshBtn.disabled = true;
@@ -143,8 +143,6 @@ class UIService {
           await this.core.loadFromServer();
           this.updatePlayersUI();
           this.core.saveState();
-
-          alert('Дані успішно оновлено!');
 
         } catch (error) {
           console.error('Помилка при оновленні даних:', error);
