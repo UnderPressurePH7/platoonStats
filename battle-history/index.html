@@ -10,7 +10,59 @@
 <body>
     <div class="container">
         <h1>Історія боїв</h1>
+        <div class="summary-stats">
+            <div class="stats-header">
+                <h2>Загальна статистика</h2>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Всього боїв</div>
+                    <div class="stat-value" id="total-battles">0</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-title">Перемоги</div>
+                    <div class="stat-value wins" id="total-victories">0</div>
+                </div>
+                
+                <!-- <div class="stat-card">
+                    <div class="stat-title">Поразки</div>
+                    <div class="stat-value defeat" id="total-defeats">0</div>
+                </div> -->
 
+                <div class="stat-card">
+                    <div class="stat-title">Відсоток перемог</div>
+                    <div class="stat-value" id="win-rate">0%</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-title">Загальна шкода</div>
+                    <div class="stat-value damage" id="total-damage">0</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-title">Середня шкода</div>
+                    <div class="stat-value damage" id="avg-damage">0</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-title">Всього фрагів</div>
+                    <div class="stat-value frags" id="total-frags">0</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-title">Середні фраги</div>
+                    <div class="stat-value frags" id="avg-frags">0</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-title">Всього очок</div>
+                    <div class="stat-value total-points" id="total-points">0</div>
+                </div>
+            </div>
+        </div>
+        
         <div class="filters">
             <div class="filter-row">
                 <div class="filter-group">
@@ -133,59 +185,6 @@
                             <div class="stat-label">Очки</div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="summary-stats">
-            <div class="stats-header">
-                <h2>Загальна статистика</h2>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-title">Всього боїв</div>
-                    <div class="stat-value" id="total-battles">0</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-title">Перемоги</div>
-                    <div class="stat-value wins" id="total-victories">0</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-title">Поразки</div>
-                    <div class="stat-value defeat" id="total-defeats">0</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-title">Відсоток перемог</div>
-                    <div class="stat-value" id="win-rate">0%</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-title">Загальна шкода</div>
-                    <div class="stat-value damage" id="total-damage">0</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-title">Середня шкода</div>
-                    <div class="stat-value damage" id="avg-damage">0</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-title">Всього фрагів</div>
-                    <div class="stat-value frags" id="total-frags">0</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-title">Середні фраги</div>
-                    <div class="stat-value frags" id="avg-frags">0</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-title">Всього очок</div>
-                    <div class="stat-value total-points" id="total-points">0</div>
                 </div>
             </div>
         </div>
