@@ -111,13 +111,13 @@ class CoreService {
     return Object.keys(this.PlayersInfo);
   }
   
-  getCurentPlayerIndex() {
-  const index = this.getPlayersIds().indexOf(this.currentPlayerId);
-  if (index === -1) {
-    throw new Error('Current player not found in players list');
-  }
-  return index;
-}
+//   getCurentPlayerIndex() {
+//   const index = this.getPlayersIds().indexOf(this.currentPlayerId);
+//   if (index === -1) {
+//     throw new Error('Current player not found in players list');
+//   }
+//   return index;
+// }
   
   compareArrays(arr1, arr2) {
     if (!Array.isArray(arr1) || !Array.isArray(arr2)) {
@@ -431,7 +431,7 @@ class CoreService {
     }
 
     const playerIds = this.getPlayersIds();
-    const index = this.getCurentPlayerIndex();
+    // const index = this.getPlayersIds().indexOf(this.currentPlayerId);
     for (const playerId of playerIds) {
       for (const vehicleId in result.vehicles) {
         const vehicles = result.vehicles[vehicleId];
@@ -448,7 +448,7 @@ class CoreService {
         }
       }
     }
-    this.sleep(index * 10 + 20);
+    // this.sleep(index * 10 + 20);
     this.serverData();
   }
 }
