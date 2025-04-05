@@ -284,48 +284,60 @@ class CoreService {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-
-async serverData(PlayerId) {
-  if (this.isSaving) return;
-  this.isSaving = true;
-
-  let retryCount = 0;
-  const maxRetries = 4;
-  let lastError = null;
-
-  while (retryCount < maxRetries) {
+  async serverData(PlayerId) {
     try {
-      const retryDelay = retryCount === 0
-        ? this.getRandomDelay(10, 100)
-        : Math.pow(2, retryCount) * 100 + Math.random() * 100;
-
-      this.sleep(retryDelay);
-
       await this.saveToServer(PlayerId);
-      this.sleep(50);
+      this.sleep(30);
       await this.loadFromServer();
-
       this.eventsCore.emit('statsUpdated');
-      this.sleep(10);
+      this.sleep(30);
       this.saveState();
-
-      this.isSaving = false;
-      return { success: true };
     } catch (error) {
-      lastError = error;
-      retryCount++;
-      console.warn(`Retry attempt ${retryCount} after error:`, error);
+      console.error('Error in serverData:', error);
     }
   }
 
-  console.error('Error in serverData after max retries:', lastError);
-  this.isSaving = false;
-  return { 
-    success: false, 
-    error: lastError,
-    message: 'Failed to synchronize data after multiple attempts'
-  };
-}
+// async serverData(PlayerId) {
+//   if (this.isSaving) return;
+//   this.isSaving = true;
+
+//   let retryCount = 0;
+//   const maxRetries = 4;
+//   let lastError = null;
+
+//   while (retryCount < maxRetries) {
+//     try {
+//       const retryDelay = retryCount === 0
+//         ? this.getRandomDelay(10, 100)
+//         : Math.pow(2, retryCount) * 100 + Math.random() * 100;
+
+//       this.sleep(retryDelay);
+
+//       await this.saveToServer(PlayerId);
+//       this.sleep(50);
+//       await this.loadFromServer();
+//       this.sleep(50);
+//       this.eventsCore.emit('statsUpdated');
+//       this.sleep(10);
+//       this.saveState();
+
+//       this.isSaving = false;
+//       return { success: true };
+//     } catch (error) {
+//       lastError = error;
+//       retryCount++;
+//       console.warn(`Retry attempt ${retryCount} after error:`, error);
+//     }
+//   }
+
+//   console.error('Error in serverData after max retries:', lastError);
+//   this.isSaving = false;
+//   return { 
+//     success: false, 
+//     error: lastError,
+//     message: 'Failed to synchronize data after multiple attempts'
+//   };
+// }
 
   handleHangarStatus(isInHangar) {
     if (!isInHangar) return;
@@ -338,7 +350,7 @@ async serverData(PlayerId) {
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
 
-    this.serverData(this.curentPlayerId)
+    this.serverData(this.sdk.data.player.name.value)
   }
 
 
