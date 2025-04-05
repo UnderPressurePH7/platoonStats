@@ -301,11 +301,9 @@ class CoreService {
   
     if (!this.isInPlatoon && playersID.length <= 1 && this.curentPlayerId != null) {
       this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
-
+      
       this.serverData();
-    }
-    
-    if (this.isInPlatoon) {
+    } else if (this.isInPlatoon && this.curentPlayerId != null) {
       this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
       this.serverData();
