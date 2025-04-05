@@ -111,9 +111,13 @@ class CoreService {
     return Object.keys(this.PlayersInfo);
   }
   
-  getCurentPlayerIndex() {
-    return this.getPlayersIds().indexOf(this.curentPlayerId);
+  getCurrentPlayerIndex() {
+  const index = this.getPlayersIds().indexOf(this.currentPlayerId);
+  if (index === -1) {
+    throw new Error('Current player not found in players list');
   }
+  return index;
+}
   
   compareArrays(arr1, arr2) {
     if (!Array.isArray(arr1) || !Array.isArray(arr2)) {
