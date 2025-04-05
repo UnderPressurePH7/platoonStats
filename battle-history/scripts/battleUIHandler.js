@@ -7,8 +7,22 @@ class BattleUIHandler {
         this.initializeUI();
 
         // Підписка на події від менеджера даних
-        this.dataManager.eventsHistory.on('statsUpdated', (data) => this.updateStats());
-        this.dataManager.eventsHistory.on('filtersApplied', (data) => this.updateBattleTable());
+        this.dataManager.eventsHistory.on('statsUpdated', () => this.updateStats());
+        
+        // ВИПРАВЛЕННЯ: Змінено обробник події filtersApplied для отримання відфільтрованих даних
+        this.dataManager.eventsHistory.on('filtersApplied', (filteredBattles) => {
+            this.updateBattleTable(filteredBattles);
+        });
+        
+        // ВИПРАВЛЕННЯ: Додали обробник події видалення бою, щоб оновлювати інтерфейс
+        this.dataManager.eventsHistory.on('battleDeleted', (battleId) => {
+
+                // Оновлюємо інтерфейс, щоб відобразити видалення
+                this.updateBattleTable();
+                this.updateStats();
+                this.setupFilters();
+
+        });
     }
 
     async initializeUI() {
@@ -26,9 +40,6 @@ class BattleUIHandler {
         // Імпорт/Експорт
         document.getElementById('export-data')?.addEventListener('click', () => this.exportData());
         document.getElementById('import-data')?.addEventListener('click', () => this.importData());
-
-        // Синхронізація
-        //document.getElementById('sync-stats')?.addEventListener('click', () => this.syncStats());
 
         // Деталі бою
         document.getElementById('close-details')?.addEventListener('click', () => this.closeBattleDetails());
@@ -77,6 +88,7 @@ class BattleUIHandler {
         if (currentValue) filter.value = currentValue;
     }
 
+    // ВИПРАВЛЕННЯ: Переписано метод applyFilters для коректної роботи фільтрів
     async applyFilters() {
         const filters = {
             map: document.getElementById('map-filter')?.value || '',
@@ -86,7 +98,12 @@ class BattleUIHandler {
             player: document.getElementById('player-filter')?.value || ''
         };
 
-        await this.dataManager.applyFilters(filters);
+        // Логуємо фільтри для діагностики
+        console.log('Застосовані фільтри:', filters);
+        
+        // Застосовуємо фільтри та отримуємо результат
+        const filteredBattles = await this.dataManager.applyFilters(filters);
+        console.log('Відфільтровані бої:', filteredBattles);
     }
 
     clearFilters() {
@@ -99,12 +116,15 @@ class BattleUIHandler {
         this.applyFilters();
     }
 
-    updateBattleTable() {
+    // ВИПРАВЛЕННЯ: Оновлено метод updateBattleTable, щоб він приймав масив відфільтрованих боїв
+    updateBattleTable(filteredBattles = null) {
         const tableBody = document.getElementById('battle-table-body');
         if (!tableBody) return;
 
         tableBody.innerHTML = '';
-        const battles = this.dataManager.getBattlesArray();
+        
+        // Використовуємо відфільтровані бої, якщо вони передані, інакше показуємо всі бої
+        const battles = filteredBattles || this.dataManager.getBattlesArray();
 
         if (!battles || battles.length === 0) {
             tableBody.innerHTML = '<tr><td colspan="10" class="no-data">Немає даних для відображення</td></tr>';
@@ -129,7 +149,6 @@ class BattleUIHandler {
         let resultClass = 'unknown';
         
         const battleResult = Number(battle.win || -1);
-        console.log('battleResult - ', battleResult);
 
         if (battleResult === -1) {
             resultClass = 'inBattle';
@@ -156,15 +175,16 @@ class BattleUIHandler {
             <td>${this.getPoints(battle)}</td>
             <td>${this.formatDuration(battle.duration || 0)}</td>
             <td>
-                <button class="view-battle" data-battle-id="${battle}">
+                <button class="view-battle" data-battle-id="${battle.id}">
                     <i class="fas fa-eye"></i>
                 </button>
-                <button class="delete-battle" data-battle-id="${battle}">
+                <button class="delete-battle" data-battle-id="${battle.id}">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
         `;
 
+        // ВИПРАВЛЕННЯ: Виправлено передачу ID бою в обробники подій
         row.querySelector('.view-battle')?.addEventListener('click', () => this.showBattleDetails(battle));
         row.querySelector('.delete-battle')?.addEventListener('click', () => this.deleteBattle(battle.id));
 
@@ -285,7 +305,7 @@ class BattleUIHandler {
                     );
                 } catch (error) {
                     console.error('Error importing data:', error);
-                    this.showNotification('Помилка при читанні файлу', 'error');
+                    this.showNotification('Помилка при читанні файлу', error);
                 }
             };
             reader.readAsText(file);

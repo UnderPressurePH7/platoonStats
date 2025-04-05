@@ -6,14 +6,26 @@ class BattleDataManager {
     this.POINTS_PER_FRAG = 400;
     this.POINTS_PER_TEAM_WIN = 2000;
     this.BATTLE_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/";
-    this.BattleStats = {};
-    this.PlayersInfo = {};
+
+    const savedState = localStorage.getItem('gameState');
+    if (savedState) {
+      const state = JSON.parse(savedState);
+      this.BattleStats = state.BattleStats || {};
+      this.PlayersInfo = state.PlayersInfo || {};
+    }
 
     this.filteredBattles = [];
     this.eventsHistory = new EventEmitter();
   }
 
-  
+  saveState() {
+    const state = {
+      BattleStats: this.BattleStats
+    };
+
+    localStorage.setItem('gameState', JSON.stringify(state));
+  }
+
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -34,7 +46,7 @@ class BattleDataManager {
     let battleDamage = 0;
     let battleKills = 0;
     battle.win == 1 ? battlePoints += this.POINTS_PER_TEAM_WIN : battlePoints += 0;
-    
+
     if (battle && battle.players) {
       Object.values(battle.players).forEach(player => {
         battlePoints += player.points || 0;
@@ -128,13 +140,6 @@ class BattleDataManager {
       console.error('Помилка при завантаженні даних із сервера:', e);
     }
   }
-
-  async serverData() {
-    await this.saveToServer();
-    this.sleep(90)
-    await this.loadFromServer();
-  }
-
   // Видалення бою
   async deleteBattle(battleId) {
 
@@ -144,13 +149,17 @@ class BattleDataManager {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-        }   
+        }
       });
-     
+
       if (!response.ok) {
         throw new Error(`Помилка при очищенні даних: ${response.statusText}`);
       }
-
+      // Видаляємо бій з локальних даних
+      if (this.BattleStats[battleId]) {
+        delete this.BattleStats[battleId];
+        this.saveState(); // Зберігаємо зміни в локальному сховищі
+      }
       const data = await response.json();
       this.eventsHistory.emit('battleDeleted', battleId);
       return true;
@@ -160,44 +169,76 @@ class BattleDataManager {
     return false;
   }
 
+  // ВИПРАВЛЕННЯ: Переписали метод applyFilters для коректної роботи фільтрації
   async applyFilters(filters) {
-    this.filteredBattles = [...this.allBattles];
+    // Отримуємо всі бої з this.BattleStats замість використання неіснуючого this.allBattles
+    let filteredBattles = this.getBattlesArray();
 
+    // Фільтруємо за мапою
     if (filters.map) {
-      this.filteredBattles = this.filteredBattles.filter(battle =>
-        battle.map === filters.map);
+      filteredBattles = filteredBattles.filter(battle =>
+        battle.mapName === filters.map
+      );
     }
+
+    // Фільтруємо за танком
     if (filters.vehicle) {
-      this.filteredBattles = this.filteredBattles.filter(battle =>
-        battle.players && Object.values(battle.players)
-          .some(player => player.vehicle === filters.vehicle));
-    }
-    if (filters.result) {
-      this.filteredBattles = this.filteredBattles.filter(battle => {
-        switch (filters.result) {
-          case 'draw': return battle.draw === true;
-          case 'victory': return battle.victory === true && !battle.draw;
-          default: return !battle.victory && !battle.draw;
-        }
+      filteredBattles = filteredBattles.filter(battle => {
+        if (!battle.players) return false;
+        return Object.values(battle.players).some(player =>
+          player.vehicle === filters.vehicle
+        );
       });
     }
+
+    // Фільтруємо за результатом
+    if (filters.result) {
+      filteredBattles = filteredBattles.filter(battle => {
+        if (filters.result === 'victory') {
+          return battle.win === 1;
+        } else if (filters.result === 'defeat') {
+          return battle.win === 0;
+        } else if (filters.result === 'draw') {
+          return battle.win === 2;
+        } else if (filters.result === 'inBattle') {
+          return battle.win === -1;
+        }
+        return true;
+      });
+    }
+
+    // Фільтруємо за датою
     if (filters.date) {
       const filterDate = new Date(filters.date);
       filterDate.setHours(0, 0, 0, 0);
-      this.filteredBattles = this.filteredBattles.filter(battle => {
-        if (!battle.timestamp) return false;
-        const battleDate = new Date(battle.timestamp);
+
+      filteredBattles = filteredBattles.filter(battle => {
+        if (!battle.startTime) return false;
+
+        const battleDate = new Date(battle.startTime);
         battleDate.setHours(0, 0, 0, 0);
+
         return battleDate.getTime() === filterDate.getTime();
       });
     }
+
+    // Фільтруємо за гравцем
     if (filters.player) {
-      this.filteredBattles = this.filteredBattles.filter(battle =>
-        battle.players && Object.values(battle.players)
-          .some(player => player.name === filters.player));
+      filteredBattles = filteredBattles.filter(battle => {
+        if (!battle.players) return false;
+
+        return Object.values(battle.players).some(player =>
+          player.name === filters.player
+        );
+      });
     }
 
-    this.eventsHistory.emit('filtersApplied', filters);
+    // Зберігаємо відфільтровані бої
+    this.filteredBattles = filteredBattles;
+
+    // Сповіщаємо про застосування фільтрів
+    this.eventsHistory.emit('filtersApplied', this.filteredBattles);
+
     return this.filteredBattles;
   }
 
@@ -210,7 +251,7 @@ class BattleDataManager {
     }
   }
 
-  
+
   async importData(importedData) {
     try {
       if (!importedData || typeof importedData !== 'object') {
@@ -244,7 +285,6 @@ class BattleDataManager {
         throw new Error('Failed to save data to server');
       }
 
-      this.events.emit('dataImported');
       return true;
 
     } catch (e) {
@@ -297,22 +337,8 @@ class BattleDataManager {
       return false;
     }
 
-    this.events.emit('statsUpdated');
     return true;
   }
-
-//   async synchronizeStats() {
-//     try {
-
-//       this.serverData();
-//       // TODO: Implement synchronization logic
-
-//       return true;
-//     } catch (e) {
-//       console.error("Error synchronizing stats:", e);
-//       return false;
-//     }
-//   }
 }
 
 export default BattleDataManager;
