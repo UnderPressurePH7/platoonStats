@@ -50,21 +50,12 @@ export default class SquadWidget {
   
       const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/`+ urlParams;
   
-
-      try {
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-      } catch (er) { 
-        localStorage.removeItem('accessKey');
-        const response = null;
-      }
-
-      
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`response is not ok`);
