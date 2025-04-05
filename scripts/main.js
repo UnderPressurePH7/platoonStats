@@ -37,15 +37,16 @@ export default class SquadWidget {
         localStorage.removeItem('accessKey');
         return false;
       }
+
+      console.log(urlParams);
   
-      const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/${urlParams}`;
+      const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/`+ urlParams;
   
       const response = await fetch(apiUrl);
       const data = await response.json();
 
       if (data.success === true) {
         localStorage.setItem('accessKey', urlParams);
-        console.log('Access granted');
         return true;
       } else {
         localStorage.removeItem('accessKey');
