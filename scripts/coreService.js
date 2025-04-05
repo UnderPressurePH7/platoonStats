@@ -284,7 +284,6 @@ class CoreService {
     try {
       await this.saveToServer(this.curentPlayerId);
       this.sleep(30);
-      this.clearState(); // TODO
       await this.loadFromServer();
       this.eventsCore.emit('statsUpdated');
       this.sleep(30);
