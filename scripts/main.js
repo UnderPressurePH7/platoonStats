@@ -8,7 +8,6 @@ export default class SquadWidget {
       return;
     }
 
-    // Якщо доступ дозволено, ініціалізуємо сервіси
     this.initializeServices();
   }
 
