@@ -284,7 +284,8 @@ class CoreService {
     // const platoonIds = this.sdk.data.platoon.slots.dbid;
     // const isPlatoonChanges = this.compareArrays(playersID, platoonIds);
 
-    if (!this.isInPlatoon && playersID.length < 1 ){
+    if (playersID.length < 1 ){
+    // if (!this.isInPlatoon && playersID.length < 1 ){
       this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
     } 
     else {
