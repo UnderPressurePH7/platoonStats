@@ -65,7 +65,7 @@ export default class SquadWidget {
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: var(--wotstat-background, #292929);
+        background-color: var(--wotstat-background,rgba(255, 255, 255, 0));
         z-index: 9999;
       `;
 
@@ -74,7 +74,7 @@ export default class SquadWidget {
         text-align: center;
         padding: 2em;
         border-radius: 1em;
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: rgba(0, 0, 0, 0.7);
         color: var(--wotstat-primary, #ffffff);
       `;
 
