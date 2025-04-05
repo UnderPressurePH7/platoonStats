@@ -186,40 +186,75 @@ class CoreService {
     return localStorage.getItem('accessKey');
   }
 
-  async saveToServer(playerId) {
-    if (this.isSaving) return;
-    this.isSaving = true;
-
+  async saveToServer() {
     try {
-      const accessKey = this.getAccessKey();
-      const response = await fetch(`${this.BATTLE_STATS_URL}${accessKey}`, {
+      // Відправляємо дані на сервер
+      const response = await fetch(`${this.BATTLE_STATS_URL}${this.getAccessKey()}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Player-ID': playerId
+          'X-Player-ID': this.curentPlayerId
         },
         body: JSON.stringify({
           BattleStats: this.BattleStats,
           PlayerInfo: this.PlayersInfo,
         }),
       });
-
-      if (!response.ok) {
+  
+      // Перевіряємо статус відповіді
+      if (!response.ok && response.status !== 202) {
         throw new Error(`Помилка при збереженні даних: ${response.statusText}`);
       }
-
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.message || 'Помилка при збереженні даних');
-      }
-
+  
+      // Завантажуємо дані з сервера
+      await this.sleep(300); // Даємо серверу час на обробку
+      await this.loadFromServer();
+  
+      // Оновлюємо UI та зберігаємо локально
+      this.eventsCore.emit('statsUpdated');
+      this.saveState();
+  
+      return true;
     } catch (error) {
-      console.error('Помилка при збереженні даних на сервер:', error);
-      throw error;
-    } finally {
-      this.isSaving = false;
+      console.error('Error in serverData:', error);
+      return false;
     }
   }
+
+  // async saveToServer(playerId) {
+  //   if (this.isSaving) return;
+  //   this.isSaving = true;
+
+  //   try {
+  //     const accessKey = this.getAccessKey();
+  //     const response = await fetch(`${this.BATTLE_STATS_URL}${accessKey}`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'X-Player-ID': playerId
+  //       },
+  //       body: JSON.stringify({
+  //         BattleStats: this.BattleStats,
+  //         PlayerInfo: this.PlayersInfo,
+  //       }),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error(`Помилка при збереженні даних: ${response.statusText}`);
+  //     }
+
+  //     const data = await response.json();
+  //     if (!data.success) {
+  //       throw new Error(data.message || 'Помилка при збереженні даних');
+  //     }
+
+  //   } catch (error) {
+  //     console.error('Помилка при збереженні даних на сервер:', error);
+  //     throw error;
+  //   } finally {
+  //     this.isSaving = false;
+  //   }
+  // }
 
   async loadFromServer() {
     try {
@@ -286,7 +321,7 @@ class CoreService {
 
   async serverData() {
     try {
-      await this.saveToServer(this.curentPlayerId);
+      await this.saveToServer();
       await this.sleep(30);
       await this.loadFromServer();
       this.eventsCore.emit('statsUpdated');
