@@ -84,11 +84,17 @@ button:hover {
   background-color: #3E8E41;
 }
 
+/* Таблиця битв - додаємо контейнер для прокрутки */
+.battle-table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 30px;
+}
+
 .battle-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  margin-bottom: 30px;
 }
 
 .battle-table th, 
@@ -96,6 +102,56 @@ button:hover {
   padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #333;
+}
+
+/* Фіксуємо ширину колонок */
+.battle-table th:first-child,
+.battle-table td:first-child {
+  min-width: 150px; /* Дата */
+}
+
+.battle-table th:nth-child(2),
+.battle-table td:nth-child(2) {
+  min-width: 120px; /* Мапа */
+}
+
+.battle-table th:nth-child(3),
+.battle-table td:nth-child(3) {
+  min-width: 90px; /* Результат */
+}
+
+.battle-table th:nth-child(4),
+.battle-table td:nth-child(4) {
+  min-width: 150px; /* Гравець */
+}
+
+.battle-table th:nth-child(5),
+.battle-table td:nth-child(5) {
+  min-width: 120px; /* Танк */
+}
+
+.battle-table th:nth-child(6),
+.battle-table td:nth-child(6),
+.battle-table th:nth-child(7),
+.battle-table td:nth-child(7),
+.battle-table th:nth-child(8),
+.battle-table td:nth-child(8) {
+  min-width: 80px; /* Шкода, Фраги, Очки */
+  text-align: right;
+}
+
+.battle-table th:nth-child(9),
+.battle-table td:nth-child(9) {
+  min-width: 120px; /* Загальні очки */
+  text-align: right;
+  white-space: nowrap;
+}
+
+.battle-table th:last-child,
+.battle-table td:last-child {
+  width: 80px;
+  min-width: 80px;
+  text-align: center;
 }
 
 .battle-table th {
@@ -115,6 +171,31 @@ button:hover {
   background-color: rgba(60, 60, 60, 0.7);
 }
 
+/* Виправлені стилі для найгіршого бою */
+.worst-battle {
+  background-color: rgba(255, 50, 50, 0.15) !important;
+}
+
+.worst-battle:hover {
+  background-color: rgba(255, 50, 50, 0.25) !important;
+}
+
+.worst-battle td:first-child {
+  position: relative;
+  padding-left: 25px; /* Додатковий відступ для індикатора */
+}
+
+.worst-battle td:first-child::before {
+  content: "‼";
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ff3232;
+  font-weight: bold;
+  font-size: 16px;
+}
+
 .victory { color: #4ee100; font-weight: bold; }
 .defeat { color: #ff4040; font-weight: bold; }
 .draw { color: #ffd700; font-weight: bold; }
@@ -122,6 +203,7 @@ button:hover {
 .damage { color: #ff9c00; }
 .frags { color: #4ee100; }
 .points { color: #4ee100; }
+.total-points { color: #d580ff; }
 
 .table-player {
   display: block;
@@ -170,33 +252,152 @@ button:hover {
   background-color: #4e54c8;
 }
 
-.battle-details {
-  background-color: rgba(40, 40, 40, 0.7);
-  border-radius: 8px;
-  padding: 20px;
-  margin-top: 20px;
-  margin-bottom: 30px;
+/* Модальне вікно */
+.modal {
   display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(3px);
 }
 
-.detail-header {
+.modal-content {
+  background-color: rgba(30, 30, 30, 0.95);
+  margin: 5% auto;
+  width: 80%;
+  max-width: 800px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: modalFadeIn 0.3s;
+  border: 1px solid rgba(80, 80, 80, 0.3);
+  overflow: hidden;
+}
+
+@keyframes modalFadeIn {
+  from {opacity: 0; transform: translateY(-30px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+.modal-header {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  border-bottom: 1px solid rgba(80, 80, 80, 0.3);
+  position: relative;
+}
+
+.modal-header-info {
+  flex: 1;
+}
+
+.modal-header-info h2 {
+  margin: 0 0 10px 0;
+  color: #fff;
+}
+
+.modal-header-info p {
+  margin: 0;
+  color: #aaa;
+}
+
+.modal-header-result {
+  text-align: right;
+  margin-right: 40px;
+}
+
+.modal-header-result h3 {
+  margin: 0 0 5px 0;
+}
+
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #aaa;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-modal:hover {
+  color: #fff;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-body h3 {
+  margin-top: 0;
   margin-bottom: 20px;
-  border-bottom: 1px solid #555;
-  padding-bottom: 15px;
+  color: #ddd;
+  text-align: center;
 }
 
-.player-performance {
-  width: 100%;
-  border-collapse: collapse;
+.stat-summary {
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
-.player-performance th, 
-.player-performance td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #333;
+.stat-summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(40, 40, 40, 0.7);
+  border-radius: 10px;
+  padding: 20px;
+  flex: 1;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-summary-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.stat-icon {
+  font-size: 24px;
+  margin-bottom: 10px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgba(50, 50, 50, 0.7);
+}
+
+.stat-summary-item:nth-child(1) .stat-icon {
+  color: #ff9c00;
+}
+
+.stat-summary-item:nth-child(2) .stat-icon {
+  color: #4ee100;
+}
+
+.stat-summary-item:nth-child(3) .stat-icon {
+  color: #d580ff;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  color: #aaa;
+  font-size: 14px;
 }
 
 .summary-stats {
@@ -246,27 +447,58 @@ button:hover {
 .stat-value.damage { color: #ff9c00; }
 .stat-value.frags { color: #4ee100; }
 .stat-value.wins { color: #4ee100; }
-.stat-value.total-points { color: #4ee100; }
+.stat-value.defeat { color: #ff4040; }
+.stat-value.total-points { color: #d580ff; }
 
 .player-name-primary { color: #4ee100; font-weight: 500; }
 .player-name-secondary { color: #ffe100; font-weight: 500; }
 .player-name-tertiary { color: #ff9c00; font-weight: 500; }
 
-.close-details {
-  text-align: right;
-  margin-top: 20px;
+/* Підсвічування найгіршого бою в модальному вікні */
+.worst-battle-modal {
+  border: 2px solid rgba(255, 50, 50, 0.5) !important;
+  box-shadow: 0 10px 30px rgba(255, 50, 50, 0.2) !important;
 }
 
+.worst-battle-badge {
+  position: absolute;
+  top: -12px;
+  right: 40px;
+  background-color: #ff3232;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  animation: badgePulse 2s infinite;
+}
+
+@keyframes badgePulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Медіа-запити для адаптивності */
 @media (max-width: 1400px) {
   .stats-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   }
-}
-
-@media (max-width: 1200px) {
+  
   .battle-table th, 
   .battle-table td {
     padding: 10px 12px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .battle-table {
+    min-width: 1100px;
+  }
+  
+  .modal-content {
+    width: 90%;
   }
 }
 
@@ -285,8 +517,24 @@ button:hover {
     width: 100%;
   }
   
-  .battle-table {
-    display: block;
-    overflow-x: auto;
+  .stat-summary {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    margin: 10% auto;
+  }
+  
+  .modal-header {
+    flex-direction: column;
+  }
+  
+  .modal-header-result {
+    margin-right: 0;
+    margin-top: 10px;
+    text-align: left;
   }
 }
