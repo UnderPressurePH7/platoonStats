@@ -304,7 +304,12 @@ class CoreService {
 
       this.serverData();
     }
+    
+    if (this.isInPlatoon) {
+      this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
+      this.serverData();
+    }
   }
 
   handleHangarVehicle(hangareVehicleData) {
@@ -316,15 +321,15 @@ class CoreService {
     if (!isInPlatoon) return;
     this.isInPlatoon = isInPlatoon;
 
-    const playersID = this.getPlayersIds();
-    const platoonIds = this.platoonIds;
-    const isPlatoonChanges = this.compareArrays(playersID, platoonIds);
+    //const playersID = this.getPlayersIds();
+    //const platoonIds = this.platoonIds;
+    //const isPlatoonChanges = this.compareArrays(playersID, platoonIds);
 
-    if (isPlatoonChanges && this.curentPlayerId != null) {
-      this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+    //if (isPlatoonChanges && this.curentPlayerId != null) {
+      //this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
-      this.serverData();
-    }
+      //this.serverData();
+    //}
   }
 
   handlePlatoonSlots(slots) {
