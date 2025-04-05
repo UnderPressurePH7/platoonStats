@@ -67,7 +67,7 @@ export default class SquadWidget {
       });
 
       if (!response.ok) {
-        throw new Error(`Помилка при завантаженні даних: ${response.statusText}`);
+        throw new Error(`response is not ok`);
       }
 
       const data = await response.json();
