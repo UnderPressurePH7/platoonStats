@@ -213,7 +213,7 @@ class CoreService {
         }
         this.eventsCore.emit('statsUpdated');
       }
-
+      return true;
     } catch (error) {
       console.error('Помилка при завантаженні даних із сервера:', error);
       throw error;

@@ -94,6 +94,7 @@ class BattleDataManager {
   }
 
   async saveToServer() {
+
     try {
       const accessKey = this.getAccessKey();
       const response = await fetch(`${this.BATTLE_STATS_URL}${accessKey}`, {
@@ -102,8 +103,7 @@ class BattleDataManager {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          BattleStats: this.BattleStats,
-          PlayerInfo: this.PlayersInfo,
+          BattleStats: this.BattleStats
         }),
       });
 
@@ -111,8 +111,14 @@ class BattleDataManager {
         throw new Error(`Помилка при збереженні даних: ${response.statusText}`);
       }
 
-    } catch (e) {
-      console.error('Помилка при збереженні даних на сервер:', e);
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message || 'Помилка при збереженні даних');
+      }
+      return true;
+    } catch (error) {
+      console.error('Помилка при збереженні даних на сервер:', error);
+      throw error;
     }
   }
 
@@ -132,14 +138,21 @@ class BattleDataManager {
 
       const data = await response.json();
 
-      if (data.BattleStats) Object.assign(this.BattleStats, data.BattleStats);
-      if (data.PlayerInfo) Object.assign(this.PlayersInfo, data.PlayerInfo);
-
-
-    } catch (e) {
-      console.error('Помилка при завантаженні даних із сервера:', e);
+      if (data.success) {
+        if (data.BattleStats) {
+          this.BattleStats = data.BattleStats;
+        }
+        if (data.PlayerInfo) {
+          this.PlayersInfo = data.PlayerInfo;
+        }
+      }
+      return true;
+    } catch (error) {
+      console.error('Помилка при завантаженні даних із сервера:', error);
+      throw error;
     }
   }
+
   // Видалення бою
   async deleteBattle(battleId) {
 
