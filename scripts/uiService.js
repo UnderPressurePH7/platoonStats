@@ -122,37 +122,102 @@ class UIService {
 
   setupEventListeners() {
 
-    // const refreshBtn = document.getElementById('refresh-btn');
-    // if (refreshBtn) {
-    //   refreshBtn.addEventListener('click', () => {
-    //     if (confirm('Оновити відображення даних?')) {
-    //       this.core.loadFromServer().then(() => {
-    //         this.updatePlayersUI();
-    //         alert('Дані оновлено!');
-    //       }).catch(error => {
-    //         console.error('Помилка при оновленні даних:', error);
-    //         alert('Помилка при оновленні даних або історія боїв порожня.');
-    //       });
-    //     }
-    //   });
-    // }
+    const refreshBtn = document.getElementById('refresh-btn');
+    if (refreshBtn) {
+      let isLoading = false;
+      
+      refreshBtn.addEventListener('click', async () => {
+        try {
+          if (isLoading) {
+            alert('Оновлення вже виконується, зачекайте будь ласка.');
+            return;
+          }
 
+          if (!confirm('Оновити відображення даних?')) {
+            return;
+          }
 
+          isLoading = true;
+          refreshBtn.disabled = true;
+          refreshBtn.textContent = 'Оновлення...';
+
+          await this.core.loadFromServer();
+          this.updatePlayersUI();
+
+          alert('Дані успішно оновлено!');
+
+        } catch (error) {
+          console.error('Помилка при оновленні даних:', error);
+          
+          if (error.message === 'Empty history') {
+            alert('Історія боїв порожня.');
+          } else if (error.message === 'Network error') {
+            alert('Помилка з`єднання з сервером. Перевірте підключення до інтернету.');
+          } else {
+            alert(`Помилка при оновленні даних: ${error.message}`);
+          }
+
+        } finally {
+          isLoading = false;
+          refreshBtn.disabled = false;
+          refreshBtn.textContent = 'Оновити дані';
+        }
+      });
+    }
 
     const restoreBtn = document.getElementById('remove-history-btn');
     if (restoreBtn) {
-      restoreBtn.addEventListener('click', () => {
-        if (confirm('Видалити поточну статистику історії боїв?')) {
-          this.core.loadFromServer().then(() => {
-            this.core.clearServerData();
-            this.core.BattleStats = {};
-            this.core.PlayersInfo = {};
-            this.updatePlayersUI();
-            alert('Статистику виделено!');
-          }).catch(error => {
-            console.error('Помилка при видаленні статистики:', error);
-            alert('Помилка при видаленні статистики або історія боїв порожня.');
-          });
+      let isDeleting = false;
+    
+      restoreBtn.addEventListener('click', async () => {
+        try {
+          if (isDeleting) {
+            alert('Процес видалення вже виконується, зачекайте будь ласка.');
+            return;
+          }
+    
+          if (!confirm('Видалити поточну статистику історії боїв?')) {
+            return;
+          }
+          if (!confirm('Ви впевнені? Це незворотна дія!')) {
+            return;
+          }
+    
+          isDeleting = true;
+          restoreBtn.disabled = true;
+          restoreBtn.textContent = 'Видалення...';
+    
+          try {
+            await this.core.loadFromServer();
+          } catch (loadError) {
+            console.warn('Попередження при завантаженні даних:', loadError);
+          }
+    
+          await this.core.clearServerData();
+          this.core.BattleStats = {};
+          this.core.PlayersInfo = {};
+          
+          this.updatePlayersUI();
+    
+          alert('Статистику успішно видалено!');
+    
+        } catch (error) {
+          console.error('Помилка при видаленні статистики:', error);
+          
+          if (error.message === 'Network error') {
+            alert('Помилка з`єднання з сервером. Перевірте підключення до інтернету.');
+          } else if (error.message === 'Permission denied') {
+            alert('Немає прав для видалення даних.');
+          } else if (error.message === 'Empty history') {
+            alert('Історія боїв вже порожня.');
+          } else {
+            alert(`Помилка при видаленні статистики: ${error.message}`);
+          }
+    
+        } finally {
+          isDeleting = false;
+          restoreBtn.disabled = false;
+          restoreBtn.textContent = 'Видалити історію';
         }
       });
     }
