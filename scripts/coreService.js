@@ -1,0 +1,385 @@
+import EventEmitter from './eventEmitter.js';
+
+class CoreService {
+  constructor() {
+    try {
+      this.sdk = new WotstatWidgetsSdk.WidgetSDK();
+    } catch (error) {
+      console.error('Failed to initialize SDK:', error);
+      throw error;
+    }
+
+    // API URLs
+    this.BATTLE_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/";
+    this.CLEAR_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/clear/"
+
+    // Constants
+    this.POINTS_PER_DAMAGE = 1;
+    this.POINTS_PER_FRAG = 400;
+    this.POINTS_PER_TEAM_WIN = 2000;
+
+    // Завантаження збережених даних при старті
+    const savedState = localStorage.getItem('gameState');
+    if (savedState) {
+      const state = JSON.parse(savedState);
+      this.BattleStats = state.BattleStats || {};
+      this.PlayersInfo = state.PlayersInfo || {};
+      this.curentPlayerId = state.curentPlayerId || null;
+      this.curentArenaId = state.curentArenaId || null;
+      this.curentVehicle = state.curentVehicle || null;
+      this.isInBattle = state.isInBattle || false;
+    } else {
+      // Якщо немає збережених даних, встановлюємо початкові значення
+      this.BattleStats = {};
+      this.PlayersInfo = {};
+      this.curentPlayerId = null;
+      this.curentArenaId = null;
+      this.curentVehicle = null;
+      this.isInBattle = false;
+    }
+    this.isSaving = false;
+  
+    // Initialize
+    this.setupSDKListeners();
+    this.events = new EventEmitter();
+    this.loadFromServer(); // Initial load
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  setupSDKListeners() {
+    this.sdk.data.hangar.isInHangar.watch(this.handleHangarStatus.bind(this));
+    this.sdk.data.hangar.vehicle.info.watch(this.handleHangarVehicle.bind(this));
+    this.sdk.data.battle.isInBattle.watch(this.handleBattleStatus.bind(this));
+    this.sdk.data.battle.arena.watch(this.handleArena.bind(this));
+    this.sdk.data.battle.onPlayerFeedback.watch(this.handlePlayerFeedback.bind(this));
+    this.sdk.data.battle.onBattleResult.watch(this.handleBattleResult.bind(this));
+  }
+
+  saveState() {
+    const state = {
+      BattleStats: this.BattleStats,
+      PlayersInfo: this.PlayersInfo,
+      curentPlayerId: this.curentPlayerId,
+      curentArenaId: this.curentArenaId,
+      curentVehicle: this.curentVehicle,
+      isInBattle: this.isInBattle
+    };
+    localStorage.setItem('gameState', JSON.stringify(state));
+  }
+
+  initializeBattleStats(arenaId, playerId) {
+    if (!this.BattleStats[arenaId]) {
+      this.BattleStats[arenaId] = {
+        startTime: Date.now(),
+        duration: 0,
+        win: -2,
+        mapName: 'Unknown Map',
+        players: {}
+      };
+    }
+
+    if (!this.BattleStats[arenaId].players[playerId]) {
+      this.BattleStats[arenaId].players[playerId] = {
+        name: this.PlayersInfo[playerId] || 'Unknown Player',
+        damage: 0,
+        kills: 0,
+        points: 0,
+        vehicle: this.curentVehicle || 'Unknown Vehicle'
+      };
+    }
+  }
+
+  getPlayer(id) {
+    return this.PlayersInfo[id] || null;
+  }
+
+  getPlayersIds() {
+    return Object.keys(this.PlayersInfo);
+  }
+
+  calculatePlayerData(playerId) {
+    let playerPoints = 0;
+    let playerDamage = 0;
+    let playerKills = 0;
+
+    try {
+      for (const arenaId in this.BattleStats) {
+        const player = this.BattleStats[arenaId].players[playerId];
+        if (player) {
+          playerPoints += player.points || 0;
+          playerDamage += player.damage || 0;
+          playerKills += player.kills || 0;
+        }
+      }
+    } catch (error) {
+      console.error('Помилка при розрахунку загальних очок гравця:', error);
+    }
+
+    return { playerPoints, playerDamage, playerKills };
+  }
+
+  calculateTeamData() {
+    let teamPoints = 0;
+    let teamDamage = 0;
+    let teamKills = 0;
+    let wins = 0;
+    let battles = 0;
+
+    try {
+      for (const arenaId in this.BattleStats) {
+        battles++;
+        if (this.BattleStats[arenaId].win === 1) {
+          teamPoints += this.POINTS_PER_TEAM_WIN;
+          wins++;
+        }
+
+        for (const playerId in this.BattleStats[arenaId].players) {
+          const player = this.BattleStats[arenaId].players[playerId];
+          teamPoints += player.points || 0;
+          teamDamage += player.damage || 0;
+          teamKills += player.kills || 0;
+        }
+      }
+    } catch (error) {
+      console.error('Помилка при розрахунку загальних очок команди:', error);
+    }
+
+    return { teamPoints, teamDamage, teamKills, wins, battles };
+  }
+
+  getAccessKey() {
+    return localStorage.getItem('accessKey');
+  }
+
+  async saveToServer() {
+    if (this.isSaving) return;
+    this.isSaving = true;
+
+    try {
+      const accessKey = this.getAccessKey();
+      const response = await fetch(`${this.BATTLE_STATS_URL}${accessKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          BattleStats: this.BattleStats,
+          PlayerInfo: this.PlayersInfo,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Помилка при збереженні даних: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message || 'Помилка при збереженні даних');
+      }
+
+    } catch (error) {
+      console.error('Помилка при збереженні даних на сервер:', error);
+      throw error;
+    } finally {
+      this.isSaving = false;
+    }
+  }
+
+  async loadFromServer() {
+    try {
+      const accessKey = this.getAccessKey();
+      const response = await fetch(`${this.BATTLE_STATS_URL}${accessKey}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Помилка при завантаженні даних: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        if (data.BattleStats) {
+          this.BattleStats = data.BattleStats;
+        }
+        if (data.PlayerInfo) {
+          this.PlayersInfo = data.PlayerInfo;
+        }
+        this.events.emit('statsUpdated');
+      }
+
+    } catch (error) {
+      console.error('Помилка при завантаженні даних із сервера:', error);
+      throw error;
+    }
+  }
+
+  async clearServerData() {
+    try {
+      const accessKey = this.getAccessKey();
+      const response = await fetch(`${this.CLEAR_STATS_URL}${accessKey}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Помилка при очищенні даних: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        this.BattleStats = {};
+        this.PlayersInfo = {};
+        this.events.emit('statsUpdated');
+      }
+
+    } catch (error) {
+      console.error('Помилка при очищенні даних на сервері:', error);
+      throw error;
+    }
+  }
+
+  async serverData() {
+    try {
+      await this.saveToServer();
+      await this.sleep(100);
+      await this.loadFromServer();
+      this.events.emit('statsUpdated');
+    } catch (error) {
+      console.error('Error in serverData:', error);
+    }
+  }
+
+  handleHangarStatus(isInHangar) {
+    if (!isInHangar) return;
+
+    this.isInBattle = false;
+    this.curentPlayerId = this.sdk.data.player.id.value;
+    this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+
+    this.serverData();
+  }
+
+  handleHangarVehicle(hangareVehicleData) {
+    if (!hangareVehicleData) return;
+    this.curentVehicle = hangareVehicleData.localizedShortName || 'Unknown Vehicle';
+  }
+
+  handleBattleStatus(inBattle) {
+    if (!inBattle) return;
+
+    this.isInBattle = inBattle;
+    if (this.curentArenaId) {
+      this.BattleStats[this.curentArenaId].startTime = Date.now();
+      this.BattleStats[this.curentArenaId].win = -1;
+    }
+
+    this.serverData();
+  }
+
+  handleArena(arenaData) {
+    if (!arenaData) return;
+
+    this.curentArenaId = this.sdk.data.battle.arenaId.value;
+    this.initializeBattleStats(this.curentArenaId, this.curentPlayerId);
+
+    this.BattleStats[this.curentArenaId].mapName = arenaData.localizedName || 'Unknown Map';
+    this.BattleStats[this.curentArenaId].players[this.curentPlayerId].vehicle = this.curentVehicle;
+    this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
+
+    this.serverData();
+  }
+
+  handlePlayerFeedback(feedback) {
+    if (!feedback || !feedback.type) return;
+
+    if (feedback.type === 'damage') {
+      this.handleDamage(feedback.data);
+    } else if (feedback.type === 'kill') {
+      this.handleKill(feedback.data);
+    }
+  }
+
+  handleDamage(damageData) {
+    if (!damageData || !this.curentArenaId || !this.curentPlayerId) return;
+
+    const arenaId = this.curentArenaId;
+    const playerId = this.curentPlayerId;
+
+    this.initializeBattleStats(arenaId, playerId);
+
+    this.BattleStats[arenaId].players[playerId].damage += damageData.damage;
+    this.BattleStats[arenaId].players[playerId].points += damageData.damage * this.POINTS_PER_DAMAGE;
+
+    this.serverData();
+  }
+
+  handleKill(killData) {
+    if (!killData || !this.curentArenaId || !this.curentPlayerId) return;
+
+    const arenaId = this.curentArenaId;
+    const playerId = this.curentPlayerId;
+
+    this.initializeBattleStats(arenaId, playerId);
+
+    this.BattleStats[arenaId].players[playerId].kills += 1;
+    this.BattleStats[arenaId].players[playerId].points += this.POINTS_PER_FRAG;
+
+    this.serverData();
+  }
+
+  handleBattleResult(result) {
+    if (!result || !result.vehicles || !result.players || !this.curentPlayerId) {
+      console.error("Invalid battle result data");
+      return;
+    }
+
+    const arenaId = result.arenaUniqueID;
+    if (!arenaId) return;
+
+    this.BattleStats[arenaId].duration = result.common.duration;
+
+    if (result?.players?.[this.curentPlayerId]?.team !== undefined &&
+      result?.common?.winnerTeam !== undefined) {
+      const playerTeam = Number(result.players[this.curentPlayerId].team);
+      const winnerTeam = Number(result.common.winnerTeam);
+
+      if (playerTeam === winnerTeam) {
+        this.BattleStats[arenaId].win = 1;
+      } else if (winnerTeam === 0) {
+        this.BattleStats[arenaId].win = 2;
+      } else {
+        this.BattleStats[arenaId].win = 0;
+      }
+    }
+
+    const playerIds = this.getPlayersIds();
+    for (const playerId of playerIds) {
+      for (const vehicleId in result.vehicles) {
+        const vehicles = result.vehicles[vehicleId];
+        for (const vehicle of vehicles) {
+          if (vehicle.accountDBID === playerId) {
+            this.initializeBattleStats(arenaId, playerId);
+            const playerStats = this.BattleStats[arenaId].players[playerId];
+            playerStats.damage = vehicle.damageDealt;
+            playerStats.kills = vehicle.kills;
+            playerStats.points = vehicle.damageDealt + (vehicle.kills * this.POINTS_PER_FRAG);
+            break;
+          }
+        }
+      }
+    }
+
+    this.serverData();
+  }
+}
+
+export default CoreService;
