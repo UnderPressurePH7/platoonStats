@@ -343,8 +343,11 @@ class CoreService {
   handleArena(arenaData) {
     if (!arenaData) return;
 
-    this.curentArenaId = this.sdk.data.battle.arenaId.value;
+    this.curentArenaId = this.sdk?.data?.battle?.arenaId?.value ?? null;
+    if (this.curentArenaId == null) return;
+    
     this.initializeBattleStats(this.curentArenaId, this.curentPlayerId);
+
 
     this.BattleStats[this.curentArenaId].mapName = arenaData.localizedName || 'Unknown Map';
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].vehicle = this.curentVehicle;
