@@ -327,19 +327,6 @@ async serverData(PlayerId) {
   };
 }
 
-  // async serverData() {
-  //   try {
-  //     await this.saveToServer(this.curentPlayerId);
-  //     this.sleep(30);
-  //     await this.loadFromServer();
-  //     this.eventsCore.emit('statsUpdated');
-  //     this.sleep(30);
-  //     this.saveState();
-  //   } catch (error) {
-  //     console.error('Error in serverData:', error);
-  //   }
-  // }
-
   handleHangarStatus(isInHangar) {
     if (!isInHangar) return;
 
