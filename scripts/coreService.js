@@ -32,6 +32,7 @@ class CoreService {
       this.curentPlayerId = null;
       this.curentArenaId = null;
       this.curentVehicle = null;
+       this.isInPlatoon = null;
     }
     this.isSaving = false;
   
