@@ -26,7 +26,7 @@ class BattleDataManager {
 
     localStorage.setItem('gameState', JSON.stringify(state));
   }
-  
+
   clearState() {
     localStorage.removeItem('gameState');
 
@@ -278,7 +278,7 @@ class BattleDataManager {
         return false;
       }
 
-      await this.loadFromServer();
+      
 
       for (const [arenaId, battleData] of Object.entries(importedData)) {
         if (!battleData || typeof battleData !== 'object') continue;
@@ -304,6 +304,9 @@ class BattleDataManager {
         throw new Error('Failed to save data to server');
       }
 
+      this.clearState();
+      await this.loadFromServer();
+      
       this.eventsHistory.emit('dataImported', importedData);
       return true;
 
