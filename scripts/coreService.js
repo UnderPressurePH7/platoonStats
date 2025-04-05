@@ -290,7 +290,7 @@ async serverData(PlayerId) {
   this.isSaving = true;
 
   let retryCount = 0;
-  const maxRetries = 3;
+  const maxRetries = 4;
   let lastError = null;
 
   while (retryCount < maxRetries) {
