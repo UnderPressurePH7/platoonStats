@@ -5,7 +5,6 @@ class BattleDataManager {
     this.POINTS_PER_DAMAGE = 1;
     this.POINTS_PER_FRAG = 400;
     this.POINTS_PER_TEAM_WIN = 2000;
-    this.EXPORT_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/export/";
     this.BATTLE_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/";
     this.IMPORT_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/import/";
    
