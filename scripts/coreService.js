@@ -51,7 +51,7 @@ class CoreService {
     this.sdk.data.hangar.isInHangar.watch(this.handleHangarStatus.bind(this));
     this.sdk.data.hangar.vehicle.info.watch(this.handleHangarVehicle.bind(this));
     this.sdk.data.platoon.isInPlatoon.watch(this.handlePlatoonStatus.bind(this));
-    this.this.sdk.data.platoon.slots.watch(handlePlatoonSlots.bind(this));
+    this.sdk.data.platoon.slots.watch(handlePlatoonSlots.bind(this));
     this.sdk.data.battle.isInBattle.watch(this.handleBattleStatus.bind(this));
     this.sdk.data.battle.arena.watch(this.handleArena.bind(this));
     this.sdk.data.battle.onPlayerFeedback.watch(this.handlePlayerFeedback.bind(this));
