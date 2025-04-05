@@ -283,10 +283,11 @@ class CoreService {
   async serverData() {
     try {
       await this.saveToServer(this.curentPlayerId);
-      this.sleep(100);
+      this.sleep(30);
+      this.clearState(); // TODO
       await this.loadFromServer();
       this.eventsCore.emit('statsUpdated');
-      this.sleep(100);
+      this.sleep(30);
       this.saveState();
     } catch (error) {
       console.error('Error in serverData:', error);
@@ -300,8 +301,9 @@ class CoreService {
     this.curentPlayerId = this.sdk.data.player.id.value;
 
     if (playersID.length >= 1 && !this.isInPlatoon) return;
-    
+
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+
 
     this.serverData()
   }
