@@ -25,6 +25,9 @@ class BattleUIHandler {
         });
 
         this.dataManager.eventsHistory.on('dataImported', (importedData) => {
+
+            this.dataManager.clearState();
+            this.dataManager.loadFromServer();
             this.updateBattleTable();
             this.updateStats();
             this.setupFilters();

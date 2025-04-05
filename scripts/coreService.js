@@ -67,6 +67,17 @@ class CoreService {
     localStorage.setItem('gameState', JSON.stringify(state));
   }
 
+  clearState() {
+    localStorage.removeItem('gameState');
+
+      this.BattleStats = {};
+      this.PlayersInfo = {};
+      this.curentPlayerId = null;
+      this.curentArenaId = null;
+      this.curentVehicle = null;
+      this.isInPlatoon = false;
+  }
+
   initializeBattleStats(arenaId, playerId) {
     if (!this.BattleStats[arenaId]) {
       this.BattleStats[arenaId] = {
@@ -282,13 +293,13 @@ class CoreService {
 
     this.curentPlayerId = this.sdk.data.player.id.value;
 
-    if (!isInPlatoon && playersID.length <= 1  && this.curentPlayerId != null) {
+    if (!isInPlatoon && playersID.length <= 1 && this.curentPlayerId != null) {
       this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
       this.serverData();
     }
 
-    
+
   }
 
   handleHangarVehicle(hangareVehicleData) {
@@ -305,7 +316,7 @@ class CoreService {
 
     if (isPlatoonChanges && this.curentPlayerId != null) {
       this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
-      
+
       this.serverData();
     }
   }

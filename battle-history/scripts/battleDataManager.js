@@ -26,6 +26,12 @@ class BattleDataManager {
 
     localStorage.setItem('gameState', JSON.stringify(state));
   }
+  
+  clearState() {
+    localStorage.removeItem('gameState');
+
+      this.BattleStats = {};
+  }
 
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
