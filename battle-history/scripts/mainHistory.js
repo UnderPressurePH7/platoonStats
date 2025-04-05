@@ -40,28 +40,35 @@ class MainHistory {
         }
     }
 
-    checkAccessKey() {
+    async checkAccessKey() {
         try {
-            // Отримуємо параметр з URL (все що після ?)
-            const urlParams = window.location.search.substring(1);
-            const VALID_KEYS = ['squad1', 'squad2', 'squad3', 'squad4', 'squad5', 'squad6', 'jtv'];
-
-            // Очищуємо та зберігаємо новий ключ
+          const urlParams = window.location.search.substring(1);
+          
+          if (!urlParams) {
             localStorage.removeItem('accessKey');
+            return false;
+          }
+      
+          const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/${urlParams}`;
+      
+          const response = await fetch(apiUrl);
+          const data = await response.json();
+    
+          if (data.success === true) {
             localStorage.setItem('accessKey', urlParams);
-
-            // Перевіряємо валідність ключа
-            if (VALID_KEYS.includes(urlParams)) {
-                return true;
-            }
-
-            console.log('No valid key found, access denied');
+            return true;
+          } else {
+            localStorage.removeItem('accessKey');
+            console.log('Access denied:', data.error);
             return false;
+          }
+      
         } catch (error) {
-            console.error('Error in checkAccessKey:', error);
-            return false;
+          console.error('Error in checkAccessKey:', error);
+          localStorage.removeItem('accessKey');
+          return false;
         }
-    }
+      }
 
     showAccessDenied() {
         try {

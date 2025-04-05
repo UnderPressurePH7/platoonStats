@@ -93,7 +93,6 @@ class BattleUIHandler {
         
         if (!allBattles || allBattles.length === 0) {
             this.worstBattleId = null;
-            console.log('Немає боїв для аналізу');
             return;
         }
 
@@ -102,7 +101,6 @@ class BattleUIHandler {
         
         if (completedBattles.length === 0) {
             this.worstBattleId = null;
-            console.log('Немає завершених боїв для аналізу');
             return;
         }
 
@@ -126,7 +124,6 @@ class BattleUIHandler {
 
             // Зберігаємо ID найгіршого бою
             this.worstBattleId = worstBattle.id;
-            console.log('Знайдено найгірший бій:', this.worstBattleId, 'з очками:', worstBattlePoints);
         } catch (error) {
             console.error('Помилка при пошуку найгіршого бою:', error);
             this.worstBattleId = null;
