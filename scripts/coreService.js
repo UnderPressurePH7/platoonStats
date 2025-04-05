@@ -186,7 +186,7 @@ class CoreService {
     return localStorage.getItem('accessKey');
   }
 
-  async saveToServer() {
+  async saveToServer(playerId) {
     if (this.isSaving) return;
     this.isSaving = true;
 
@@ -196,7 +196,7 @@ class CoreService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Player-ID': this.curentPlayerId
+          'X-Player-ID': playerId
         },
         body: JSON.stringify({
           BattleStats: this.BattleStats,
@@ -282,7 +282,7 @@ class CoreService {
 
   async serverData() {
     try {
-      await this.saveToServer();
+      await this.saveToServer(this.curentPlayerId);
       this.sleep(100);
       await this.loadFromServer();
       this.eventsCore.emit('statsUpdated');
@@ -422,6 +422,8 @@ class CoreService {
             playerStats.damage = vehicle.damageDealt;
             playerStats.kills = vehicle.kills;
             playerStats.points = vehicle.damageDealt + (vehicle.kills * this.POINTS_PER_FRAG);
+            this.saveToServer(playerId);
+            this.sleep(10);
             break;
           }
         }
