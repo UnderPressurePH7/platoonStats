@@ -9,16 +9,13 @@ class CoreService {
       throw error;
     }
 
-    // API URLs
     this.BATTLE_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/";
     this.CLEAR_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/clear/"
 
-    // Constants
     this.POINTS_PER_DAMAGE = 1;
     this.POINTS_PER_FRAG = 400;
     this.POINTS_PER_TEAM_WIN = 2000;
 
-    // Завантаження збережених даних при старті
     const savedState = localStorage.getItem('gameState');
     if (savedState) {
       const state = JSON.parse(savedState);
@@ -27,22 +24,21 @@ class CoreService {
       this.curentPlayerId = state.curentPlayerId || null;
       this.curentArenaId = state.curentArenaId || null;
       this.curentVehicle = state.curentVehicle || null;
-      this.isInBattle = state.isInBattle || false;
+      this.isInPlatoon = state.isInPlatoon || false;
     } else {
-      // Якщо немає збережених даних, встановлюємо початкові значення
+
       this.BattleStats = {};
       this.PlayersInfo = {};
       this.curentPlayerId = null;
       this.curentArenaId = null;
       this.curentVehicle = null;
-      this.isInBattle = false;
     }
     this.isSaving = false;
   
     // Initialize
     this.setupSDKListeners();
     this.eventsCore = new EventEmitter();
-    this.loadFromServer(); // Initial load
+    this.loadFromServer();
   }
 
   sleep(ms) {
@@ -50,6 +46,7 @@ class CoreService {
   }
 
   setupSDKListeners() {
+    this.sdk.data.platoon.isInPlatoon.watch(this.handlePlatoonStatus.bind(this));
     this.sdk.data.hangar.isInHangar.watch(this.handleHangarStatus.bind(this));
     this.sdk.data.hangar.vehicle.info.watch(this.handleHangarVehicle.bind(this));
     this.sdk.data.battle.isInBattle.watch(this.handleBattleStatus.bind(this));
@@ -65,7 +62,7 @@ class CoreService {
       curentPlayerId: this.curentPlayerId,
       curentArenaId: this.curentArenaId,
       curentVehicle: this.curentVehicle,
-      isInBattle: this.isInBattle
+      isInPlatoon: this.isInPlatoon
     };
     localStorage.setItem('gameState', JSON.stringify(state));
   }
@@ -99,6 +96,25 @@ class CoreService {
   getPlayersIds() {
     return Object.keys(this.PlayersInfo);
   }
+
+  compareArrays(arr1, arr2) {
+    if (!Array.isArray(arr1) || !Array.isArray(arr2)) {
+        return false;
+    }
+    
+    const shorterArr = arr1.length <= arr2.length ? arr1 : arr2;
+    const longerArr = arr1.length <= arr2.length ? arr2 : arr1;
+    
+    let matches = 0;
+    
+    shorterArr.forEach(element => {
+        if (longerArr.includes(element)) {
+            matches++;
+        }
+    });
+    
+    return matches === shorterArr.length;
+}
 
   calculatePlayerData(playerId) {
     let playerPoints = 0;
@@ -263,9 +279,7 @@ class CoreService {
   handleHangarStatus(isInHangar) {
     if (!isInHangar) return;
 
-    this.isInBattle = false;
     this.curentPlayerId = this.sdk.data.player.id.value;
-    this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
     this.serverData();
   }
@@ -275,10 +289,26 @@ class CoreService {
     this.curentVehicle = hangareVehicleData.localizedShortName || 'Unknown Vehicle';
   }
 
+  handlePlatoonStatus(isInPlatoon) {
+
+    const playersID = getPlayersIds();
+    const platoonIds = this.sdk.platoon.slots.dbid
+    const isPlatoonChanges = this.compareArrays(playersID,platoonIds);
+
+    if (!isInPlatoon && playersID.length <=1 ){
+      this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+    } 
+    if (isPlatoonChanges) {
+      this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+    }
+    
+    this.serverData();
+
+  }
+
   handleBattleStatus(inBattle) {
     if (!inBattle) return;
 
-    this.isInBattle = inBattle;
     if (this.curentArenaId) {
       this.BattleStats[this.curentArenaId].startTime = Date.now();
       this.BattleStats[this.curentArenaId].win = -1;
@@ -316,8 +346,6 @@ class CoreService {
     const arenaId = this.curentArenaId;
     const playerId = this.curentPlayerId;
 
-    this.initializeBattleStats(arenaId, playerId);
-
     this.BattleStats[arenaId].players[playerId].damage += damageData.damage;
     this.BattleStats[arenaId].players[playerId].points += damageData.damage * this.POINTS_PER_DAMAGE;
 
@@ -329,8 +357,6 @@ class CoreService {
 
     const arenaId = this.curentArenaId;
     const playerId = this.curentPlayerId;
-
-    this.initializeBattleStats(arenaId, playerId);
 
     this.BattleStats[arenaId].players[playerId].kills += 1;
     this.BattleStats[arenaId].players[playerId].points += this.POINTS_PER_FRAG;
@@ -369,7 +395,6 @@ class CoreService {
         const vehicles = result.vehicles[vehicleId];
         for (const vehicle of vehicles) {
           if (vehicle.accountDBID === playerId) {
-            this.initializeBattleStats(arenaId, playerId);
             const playerStats = this.BattleStats[arenaId].players[playerId];
             playerStats.damage = vehicle.damageDealt;
             playerStats.kills = vehicle.kills;

@@ -52,7 +52,6 @@ class UIService {
     const cleanName = this.formatPlayerName(playerName);
     const displayName = this.truncateName(cleanName);
 
-    // Перевірка наявності даних бою та гравця
     let battleDamage = 0;
     let battleKills = 0;
 
@@ -143,6 +142,7 @@ class UIService {
 
           await this.core.loadFromServer();
           this.updatePlayersUI();
+          this.core.saveState();
 
           alert('Дані успішно оновлено!');
 
