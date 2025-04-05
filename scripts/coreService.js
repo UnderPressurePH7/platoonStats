@@ -280,17 +280,18 @@ class CoreService {
   handleHangarStatus(isInHangar) {
     if (!isInHangar) return;
     this.curentPlayerId = this.sdk.data.player.id.value;
-    const playersID = this.getPlayersIds();
+  
+    this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+    // const playersID = this.getPlayersIds();
     // const platoonIds = this.sdk.data.platoon.slots.dbid;
     // const isPlatoonChanges = this.compareArrays(playersID, platoonIds);
 
-    if (playersID.length < 1 ){
-    // if (!this.isInPlatoon && playersID.length < 1 ){
-      this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
-    } 
-    else {
-      this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
-    }
+   // if (playersID.length < 1 ){
+   //  this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+   // } 
+   // else {
+   //  this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
+   // }
     
     this.serverData();
   }
