@@ -1,5 +1,5 @@
-import BattleDataManager from './battleDataManager2.js';
-import BattleUIHandler from './battleUIHandler2.js';
+import BattleDataManager from './battleDataManager.js';
+import BattleUIHandler from './battleUIHandler.js';
 
 class MainHistory {
     constructor() {
