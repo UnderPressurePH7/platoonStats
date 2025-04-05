@@ -23,6 +23,9 @@ class BattleUIHandler {
                 this.updateBattleTable();
                 this.updateStats();
                 this.setupFilters();
+
+                this.dataManager.saveState();
+                this.dataManager.saveToServer();
             }
         });
     }

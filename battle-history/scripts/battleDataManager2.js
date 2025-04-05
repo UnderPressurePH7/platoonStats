@@ -18,7 +18,14 @@ class BattleDataManager {
     this.eventsHistory = new EventEmitter();
   }
 
-  
+  saveState() {
+    const state = {
+      BattleStats: this.BattleStats
+    };
+
+    localStorage.setItem('gameState', JSON.stringify(state));
+  }
+
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -133,13 +140,6 @@ class BattleDataManager {
       console.error('Помилка при завантаженні даних із сервера:', e);
     }
   }
-
-  async serverData() {
-    await this.saveToServer();
-    this.sleep(90)
-    await this.loadFromServer();
-  }
-
   // Видалення бою
   async deleteBattle(battleId) {
 

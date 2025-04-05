@@ -250,9 +250,11 @@ class CoreService {
   async serverData() {
     try {
       await this.saveToServer();
-      await this.sleep(100);
+      this.sleep(100);
       await this.loadFromServer();
       this.events.emit('statsUpdated');
+      this.sleep(100);
+      this.saveState();
     } catch (error) {
       console.error('Error in serverData:', error);
     }
