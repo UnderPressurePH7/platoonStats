@@ -51,43 +51,46 @@ class MainHistory {
 
     async checkAccessKey() {
         try {
-            const urlParams = window.location.search.substring(1);
-
-            if (!urlParams) {
-                localStorage.removeItem('accessKey');
-                return false;
-            }
-
-            const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/` + urlParams;
-
-            const response = await fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`response is not ok`);
-            }
-
-            const data = await response.json();
-
-            if (data.success) {
-                localStorage.setItem('accessKey', urlParams);
-                return true;
-            } else {
-                localStorage.removeItem('accessKey');
-                console.log('Access denied:', data.error);
-                return false;
-            }
-
-        } catch (error) {
-            console.error('Error in checkAccessKey:', error);
-            localStorage.removeItem('accessKey');
+          localStorage.removeItem('accessKey');
+          const urlParams = window.location.search.substring(1);
+          
+          if (!urlParams) {
             return false;
+          }
+      
+          const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/${urlParams}`;
+      
+          const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+      
+          if (response.status === 401) {
+            return false;
+          }
+      
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+      
+          const data = await response.json();
+      
+          if (data.success) {
+            localStorage.setItem('accessKey', urlParams);
+            return true;
+          }
+          
+          return false;
+      
+        } catch (error) {
+          if (!(error instanceof Response) || error.status !== 401) {
+            console.error('Error in checkAccessKey:', error);
+          }
+          return false;
         }
-    }
+      }
 
     showAccessDenied() {
         try {
