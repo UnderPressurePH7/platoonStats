@@ -44,7 +44,7 @@ export default class SquadWidget {
     }
   }
 
-  checkAccessKey() {
+  async checkAccessKey() {
     try {
       localStorage.removeItem('accessKey');
       const urlParams = window.location.search.substring(1);
@@ -58,8 +58,8 @@ export default class SquadWidget {
   
       const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/`+ urlParams;
   
-      const response = fetch(apiUrl);
-      const data = response.json();
+      const response = await fetch(apiUrl);
+      const data = await response.json();
 
       if (data.success === true) {
         localStorage.setItem('accessKey', urlParams);
