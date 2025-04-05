@@ -21,7 +21,7 @@ class CoreService {
       const state = JSON.parse(savedState);
       this.BattleStats = state.BattleStats || {};
       this.PlayersInfo = state.PlayersInfo || {};
-      this.curentPlayerId = state.curentPlayerId || null;
+      this.curentPlayerId = state.curentPlayerId || this.sdk.data.player.id.value;
       this.curentArenaId = state.curentArenaId || null;
       this.curentVehicle = state.curentVehicle || null;
       this.isInPlatoon = state.isInPlatoon || false;
@@ -30,7 +30,7 @@ class CoreService {
 
       this.BattleStats = {};
       this.PlayersInfo = {};
-      this.curentPlayerId = null;
+      this.curentPlayerId = this.sdk.data.player.id.value;
       this.curentArenaId = null;
       this.curentVehicle = null;
       this.platoonIds = null;
@@ -74,7 +74,7 @@ class CoreService {
 
     this.BattleStats = {};
     this.PlayersInfo = {};
-    this.curentPlayerId = null;
+    this.curentPlayerId = this.sdk.data.player.id.value;
     this.curentArenaId = null;
     this.curentVehicle = null;
     this.isInPlatoon = false;
