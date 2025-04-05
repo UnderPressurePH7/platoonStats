@@ -121,20 +121,17 @@ class UIService {
   }
 
   setupEventListeners() {
-    
+
     const refreshBtn = document.getElementById('refresh-btn');
     if (refreshBtn) {
       refreshBtn.addEventListener('click', () => {
-        if (confirm('Оновити дані?')) {
-          this.updatePlayersUI().then(() => {
-            alert('Статистику Оновленно!');
-          }).catch(error => {
-            console.error('Помилка оновлення даних:', error);
-            alert('Помилка при оновленні даних.');
-          });
+        if (confirm('Оновити відображення даних?')) {
+          this.updatePlayersUI()
+          alert('Відображення оновленно!');
         }
       });
     }
+
 
 
     const restoreBtn = document.getElementById('remove-history-btn');
