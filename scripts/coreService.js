@@ -291,7 +291,7 @@ class CoreService {
 
   handlePlatoonStatus(isInPlatoon) {
 
-    const playersID = getPlayersIds();
+    const playersID = this.getPlayersIds();
     const platoonIds = this.sdk.platoon.slots.dbid
     const isPlatoonChanges = this.compareArrays(playersID,platoonIds);
 
