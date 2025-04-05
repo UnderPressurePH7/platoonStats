@@ -5,8 +5,9 @@ class BattleDataManager {
     this.POINTS_PER_DAMAGE = 1;
     this.POINTS_PER_FRAG = 400;
     this.POINTS_PER_TEAM_WIN = 2000;
-    this.BATTLE_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/";
-
+    this.EXPORT_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/export/";
+    this.IMPORT_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/import/";
+   
     const savedState = localStorage.getItem('gameState');
     if (savedState) {
       const state = JSON.parse(savedState);
@@ -97,7 +98,7 @@ class BattleDataManager {
 
     try {
       const accessKey = this.getAccessKey();
-      const response = await fetch(`${this.BATTLE_STATS_URL}${accessKey}`, {
+      const response = await fetch(`${this.IMPORT_URL}${accessKey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -125,7 +126,7 @@ class BattleDataManager {
   async loadFromServer() {
     try {
       const accessKey = this.getAccessKey();
-      const response = await fetch(`${this.BATTLE_STATS_URL}${accessKey}`, {
+      const response = await fetch(`${this.EXPORT_URL}${accessKey}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
