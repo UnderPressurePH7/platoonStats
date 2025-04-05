@@ -3,7 +3,7 @@ class UIService {
     this.core = coreService;
     this.setupEventListeners();
 
-    this.core.events.on('statsUpdated', () => {
+    this.core.eventsCore.on('statsUpdated', () => {
       this.updatePlayersUI();
     });
   }

@@ -41,7 +41,7 @@ class CoreService {
   
     // Initialize
     this.setupSDKListeners();
-    this.events = new EventEmitter();
+    this.eventsCore = new EventEmitter();
     this.loadFromServer(); // Initial load
   }
 
@@ -211,7 +211,7 @@ class CoreService {
         if (data.PlayerInfo) {
           this.PlayersInfo = data.PlayerInfo;
         }
-        this.events.emit('statsUpdated');
+        this.eventsCore.emit('statsUpdated');
       }
 
     } catch (error) {
@@ -238,7 +238,7 @@ class CoreService {
       if (data.success) {
         this.BattleStats = {};
         this.PlayersInfo = {};
-        this.events.emit('statsUpdated');
+        this.eventsCore.emit('statsUpdated');
       }
 
     } catch (error) {
@@ -252,7 +252,7 @@ class CoreService {
       await this.saveToServer();
       this.sleep(100);
       await this.loadFromServer();
-      this.events.emit('statsUpdated');
+      this.eventsCore.emit('statsUpdated');
       this.sleep(100);
       this.saveState();
     } catch (error) {
