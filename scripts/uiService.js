@@ -5,20 +5,20 @@ class UIService {
 
     this.core.events.on('statsUpdated', () => {
       this.updatePlayersUI();
-  });
+    });
   }
 
   updatePlayersUI() {
     const container = document.getElementById('player-container');
     container.innerHTML = '';
-    
+
     const uniquePlayerIds = this.core.getPlayersIds();
-    
+
     if (uniquePlayerIds.length === 0) {
       this.showEmptyMessage(container);
       return;
     }
-    
+
     this.renderPlayerRows(container, uniquePlayerIds);
     this.updateTeamStatsUI();
   }
@@ -32,11 +32,11 @@ class UIService {
 
   renderPlayerRows(container, playerIds) {
     const playerRowStyle = playerIds.length > 2 ? 'font-size: 12px;' : '';
-    
+
     playerIds.forEach(playerId => {
       const playerName = this.core.PlayersInfo[playerId];
       if (!playerName) return;
-      
+
       const playerRow = this.createPlayerRow(playerId, playerRowStyle);
       container.appendChild(playerRow);
     });
@@ -46,7 +46,7 @@ class UIService {
     const playerRow = document.createElement('div');
     playerRow.className = 'player-row';
     if (style) playerRow.style = style;
-    
+
     const playerName = this.core.PlayersInfo[playerId];
     const arenaId = this.core.curentArenaId;
     const cleanName = this.formatPlayerName(playerName);
@@ -55,18 +55,18 @@ class UIService {
     // Перевірка наявності даних бою та гравця
     let battleDamage = 0;
     let battleKills = 0;
-    
-    if (arenaId && this.core.BattleStats[arenaId] && 
-        this.core.BattleStats[arenaId].players && 
-        this.core.BattleStats[arenaId].players[playerId]) {
+
+    if (arenaId && this.core.BattleStats[arenaId] &&
+      this.core.BattleStats[arenaId].players &&
+      this.core.BattleStats[arenaId].players[playerId]) {
       battleDamage = this.core.BattleStats[arenaId].players[playerId].damage || 0;
       battleKills = this.core.BattleStats[arenaId].players[playerId].kills || 0;
     }
-    
+
     const totalPlayerData = this.core.calculatePlayerData(playerId);
     const displayDamage = totalPlayerData.playerDamage;
     const displayKills = totalPlayerData.playerKills;
-    const playerPoints = totalPlayerData.playerPoints;     
+    const playerPoints = totalPlayerData.playerPoints;
 
     playerRow.innerHTML = `
       <div class="player-name" title="${cleanName}">${displayName}</div>
@@ -82,7 +82,7 @@ class UIService {
         <div class="points">${playerPoints.toLocaleString()}</div>
       </div>
     `;
-    
+
     return playerRow;
   }
 
@@ -90,7 +90,7 @@ class UIService {
     const teamStats = this.core.calculateTeamData();
     document.getElementById('team-damage').textContent = teamStats.teamDamage.toLocaleString();
     document.getElementById('team-frags').textContent = teamStats.teamKills.toLocaleString();
-    document.getElementById('battles-count').textContent = 
+    document.getElementById('battles-count').textContent =
       `${teamStats.wins}/${teamStats.battles}`;
     document.getElementById('team-points').textContent = teamStats.teamPoints.toLocaleString();
   }
@@ -109,10 +109,10 @@ class UIService {
       zIndex: '9999',
       boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)'
     });
-    
+
     notification.textContent = 'Бій збережено в історію';
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
       if (document.body.contains(notification)) {
         document.body.removeChild(notification);
@@ -121,6 +121,22 @@ class UIService {
   }
 
   setupEventListeners() {
+    
+    const refreshBtn = document.getElementById('refresh-btn');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => {
+        if (confirm('Оновити дані?')) {
+          this.updatePlayersUI().then(() => {
+            alert('Статистику Оновленно!');
+          }).catch(error => {
+            console.error('Помилка оновлення даних:', error);
+            alert('Помилка при оновленні даних.');
+          });
+        }
+      });
+    }
+
+
     const restoreBtn = document.getElementById('remove-history-btn');
     if (restoreBtn) {
       restoreBtn.addEventListener('click', () => {
@@ -147,7 +163,7 @@ class UIService {
       });
     }
   }
-  
+
   formatPlayerName(name) {
     if (!name) return 'Невідомий гравець';
     return String(name).replace(/\s*\[.*?\]/, '');
