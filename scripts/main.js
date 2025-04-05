@@ -53,8 +53,6 @@ export default class SquadWidget {
         localStorage.removeItem('accessKey');
         return false;
       }
-
-      console.log(urlParams);
   
       const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/`+ urlParams;
   
