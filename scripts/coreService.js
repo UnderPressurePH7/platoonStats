@@ -291,14 +291,14 @@ class CoreService {
   handleHangarStatus(isInHangar) {
     if (!isInHangar) return;
 
+    const playersID = this.getPlayersIds();
     this.curentPlayerId = this.sdk.data.player.id.value;
-
+  
     if (!this.isInPlatoon && playersID.length <= 1 && this.curentPlayerId != null) {
       this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
       this.serverData();
     }
-
 
   }
 
@@ -308,6 +308,7 @@ class CoreService {
   }
 
   handlePlatoonStatus(isInPlatoon) {
+    if (!isInPlatoon) return;
     this.isInPlatoon = isInPlatoon;
 
     const playersID = this.getPlayersIds();
