@@ -328,12 +328,13 @@ class CoreService {
   }
 
   handleBattleStatus(inBattle) {
-    if (!inBattle) return;
+    if (!inBattle|| !this.curentArenaId || !this.curentPlayerId) return;
+
 
   }
 
   handleArena(arenaData) {
-    if (!arenaData) return;
+    if (!arenaData ) return;
 
     this.curentArenaId = this.sdk?.data?.battle?.arenaId?.value ?? null;
 
