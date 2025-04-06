@@ -364,7 +364,7 @@ class CoreService {
   handleOnAnyDamage(onDamageData) {
     if (!onDamageData || !this.curentArenaId || !this.curentPlayerId) return;
 
-    this.serverData();
+    // this.serverData();
   }
 
   handlePlayerDamage(damageData) {
