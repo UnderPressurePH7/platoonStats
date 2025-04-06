@@ -109,28 +109,9 @@ class CoreService {
     return this.PlayersInfo[id] || null;
   }
 
-  getPlayersIds() {
-    return Object.keys(this.PlayersInfo) || null;
-  }
-
-  compareArrays(arr1, arr2) {
-    if (!Array.isArray(arr1) || !Array.isArray(arr2)) {
-      return false;
-    }
-
-    const shorterArr = arr1.length <= arr2.length ? arr1 : arr2;
-    const longerArr = arr1.length <= arr2.length ? arr2 : arr1;
-
-    let matches = 0;
-
-    shorterArr.forEach(element => {
-      if (longerArr.includes(element)) {
-        matches++;
-      }
-    });
-
-    return matches === shorterArr.length;
-  }
+getPlayersIds() {
+  return Object.keys(this.PlayersInfo || {});
+}
 
   calculatePlayerData(playerId) {
     let playerPoints = 0;
