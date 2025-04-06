@@ -351,6 +351,8 @@ getPlayersIds() {
       this.handlePlayerTrackAssist(feedback.data);
     } else if (feedback.type === 'tanking') {
       this.handlePlayerTanking(feedback.data);
+    } else if (feedback.type === 'receivedDamage') {
+      this.handlePlayerReceivedDamage(feedback.data);
     }
   }
 
@@ -400,6 +402,11 @@ getPlayersIds() {
     this.serverData();
   }
 
+  handlePlayerReceivedDamage(receivedDamage) {
+    if (!receivedDamage || !this.curentArenaId || !this.curentPlayerId) return;
+    // шкода завдана по гравцеві
+    this.serverData();
+  }
 
   // РЕЗУЛЬТАТИ БОЮ  
   handleBattleResult(result) {
