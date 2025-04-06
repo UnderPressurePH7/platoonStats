@@ -275,9 +275,7 @@ class CoreService {
     }
   }
 
-  getRandomDelay(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-  }
+
 
   async serverData() {
     try {
@@ -292,7 +290,7 @@ class CoreService {
     }
   }
 
-
+  // ОБРОБНИКИ ПОДІЙ В ГАРАЖІ
   handleHangarStatus(isInHangar) {
     if (!isInHangar) return;
 
@@ -314,27 +312,27 @@ class CoreService {
     this.curentVehicle = hangareVehicleData.localizedShortName || 'Unknown Vehicle';
   }
 
-  handlePlatoonStatus(isInPlatoon) {
-    if (!isInPlatoon) return;
-    this.isInPlatoon = isInPlatoon;
+  // handlePlatoonStatus(isInPlatoon) {
+  //   if (!isInPlatoon) return;
+  //   this.isInPlatoon = isInPlatoon;
 
-  }
+  // }
 
-  handlePlatoonSlots(slots) {
-    if (!slots) return;
+  // handlePlatoonSlots(slots) {
+  //   if (!slots) return;
 
-    this.platoonIds = slots.dbid;
+  //   this.platoonIds = slots.dbid;
 
-  }
+  // }
 
-  handleBattleStatus(inBattle) {
-    if (!inBattle|| !this.curentArenaId || !this.curentPlayerId) return;
+  // handleBattleStatus(inBattle) {
+  //   if (!inBattle|| !this.curentArenaId || !this.curentPlayerId) return;
 
+  // }
 
-  }
-
+  // ОБРОБНИК ПОДІЙ АРЕНИ
   handleArena(arenaData) {
-    if (!arenaData ) return;
+    if (!arenaData) return;
 
     this.curentArenaId = this.sdk?.data?.battle?.arenaId?.value ?? null;
 
@@ -351,22 +349,33 @@ class CoreService {
     this.serverData();
   }
 
+  // ПОДІЯ НА НАНЕСЕННЯ ШКОДИ В КОЛІ ВІДМАЛЬВКИ
+  handleOnAnyDamage(onDamageData) {
+    if (!onDamageData || !this.curentArenaId || !this.curentPlayerId) return;
+    if (onDamageData.attacker.playerId === this.curentPlayerId) return;
+
+    this.sleep(50);
+    this.serverData();
+  }
+
+  // ОБРОБНИКИ ПОДІЙ ПОВ'ЯЗАНИХ ІЗ ДІЯМИ ГРАВЦЯ
   handlePlayerFeedback(feedback) {
     if (!feedback || !feedback.type) return;
-    
+
     if (feedback.type === 'damage') {
       this.handlePlayerDamage(feedback.data);
     } else if (feedback.type === 'kill') {
       this.handlePlayerKill(feedback.data);
+    } else if (feedback.type === 'radioAssist') {
+      this.handlePlayerRadioAssist(feedback.data);
+    } else if (feedback.type === 'trackAssist') {
+      this.handlePlayerTrackAssist(feedback.data);
+    } else if (feedback.type === 'tanking') {
+      this.handlePlayerTanking(feedback.data);
     }
   }
 
-  handleOnAnyDamage(onDamageData) {
-    if (!onDamageData || !this.curentArenaId || !this.curentPlayerId) return;
-    if (onDamageData.attacker.playerId === this.curentPlayerId) return;
- 
-    this.serverData();
-  }
+  
 
   handlePlayerDamage(damageData) {
     if (!damageData || !this.curentArenaId || !this.curentPlayerId) return;
@@ -392,6 +401,28 @@ class CoreService {
     this.serverData();
   }
 
+
+  handlePlayerRadioAssist(radioAssist) {
+    if (!radioAssist || !this.curentArenaId || !this.curentPlayerId) return;
+    // асист по розвідці
+    this.serverData();
+  }
+
+
+  handlePlayerTrackAssist(trackAssist) {
+    if (!trackAssist || !this.curentArenaId || !this.curentPlayerId) return;
+    // асист по гуслях
+    this.serverData();
+  }
+
+  handlePlayerTanking(tanking) {
+    if (!tanking || !this.curentArenaId || !this.curentPlayerId) return;
+    // заблоковано шкоди
+    this.serverData();
+  }
+
+
+  // РЕЗУЛЬТАТИ БОЮ  
   handleBattleResult(result) {
     if (!result || !result.vehicles || !result.players || !this.curentPlayerId) {
       console.error("Invalid battle result data");
