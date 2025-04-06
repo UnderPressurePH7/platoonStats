@@ -334,8 +334,7 @@ getPlayersIds() {
     if (!onDamageData || !this.curentArenaId || !this.curentPlayerId) return;
     if (onDamageData.attacker.playerId === this.curentPlayerId) return;
 
-    this.sleep(50);
-    this.serverData();
+    //this.serverData();
   }
 
   // ОБРОБНИКИ ПОДІЙ ПОВ'ЯЗАНИХ ІЗ ДІЯМИ ГРАВЦЯ
