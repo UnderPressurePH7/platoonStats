@@ -299,7 +299,7 @@ class CoreService {
     this.curentPlayerId = this.sdk.data.player.id.value;
 
     if (this.curentPlayerId === null) return;
-    if (playersID.length >1 && !this.isInPlatoon) return;
+    if (playersID.length >= 1 && !this.isInPlatoon) return;
 
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
