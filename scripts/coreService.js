@@ -257,6 +257,16 @@ getPlayersIds() {
     }
   }
 
+  async serverDataLoad() {
+    try {
+      await this.loadFromServer();
+      this.eventsCore.emit('statsUpdated');
+      await this.sleep(30);
+      this.saveState();
+    } catch (error) {
+      console.error('Error in serverData:', error);
+    }
+  }
 
 
   async serverData() {
@@ -334,7 +344,7 @@ getPlayersIds() {
     if (!onDamageData || !this.curentArenaId || !this.curentPlayerId) return;
     if (onDamageData.attacker.playerId === this.curentPlayerId) return;
 
-    //this.serverData();
+    // this.serverDataLoad();
   }
 
   // ОБРОБНИКИ ПОДІЙ ПОВ'ЯЗАНИХ ІЗ ДІЯМИ ГРАВЦЯ
@@ -386,26 +396,26 @@ getPlayersIds() {
   handlePlayerRadioAssist(radioAssist) {
     if (!radioAssist || !this.curentArenaId || !this.curentPlayerId) return;
     // асист по розвідці
-    this.serverData();
+    this.serverDataLoad();
   }
 
 
   handlePlayerTrackAssist(trackAssist) {
     if (!trackAssist || !this.curentArenaId || !this.curentPlayerId) return;
     // асист по гуслях
-    this.serverData();
+    this.serverDataLoad();
   }
 
   handlePlayerTanking(tanking) {
     if (!tanking || !this.curentArenaId || !this.curentPlayerId) return;
     // заблоковано шкоди
-    this.serverData();
+    this.serverDataLoad();
   }
 
   handlePlayerReceivedDamage(receivedDamage) {
     if (!receivedDamage || !this.curentArenaId || !this.curentPlayerId) return;
     // шкода завдана по гравцеві
-    this.serverData();
+    this.serverDataLoad();
   }
 
   // РЕЗУЛЬТАТИ БОЮ  
