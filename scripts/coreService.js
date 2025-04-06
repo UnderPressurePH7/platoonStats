@@ -52,6 +52,7 @@ class CoreService {
     this.sdk.data.platoon.slots.watch(this.handlePlatoonSlots.bind(this));
     this.sdk.data.battle.isInBattle.watch(this.handleBattleStatus.bind(this));
     this.sdk.data.battle.arena.watch(this.handleArena.bind(this));
+    this.sdk.data.battle.onDamage.watch(this.handleOnAnyDamage(this));
     this.sdk.data.battle.onPlayerFeedback.watch(this.handlePlayerFeedback.bind(this));
     this.sdk.data.battle.onBattleResult.watch(this.handleBattleResult.bind(this));
   }
@@ -353,13 +354,19 @@ class CoreService {
     if (!feedback || !feedback.type) return;
 
     if (feedback.type === 'damage') {
-      this.handleDamage(feedback.data);
+      this.handlePlayerDamage(feedback.data);
     } else if (feedback.type === 'kill') {
-      this.handleKill(feedback.data);
+      this.handlePlayerKill(feedback.data);
     }
   }
 
-  handleDamage(damageData) {
+  handleOnAnyDamage(onDamageData) {
+    if (!onDamageData || !this.curentArenaId || !this.curentPlayerId) return;
+
+    this.serverData();
+  }
+
+  handlePlayerDamage(damageData) {
     if (!damageData || !this.curentArenaId || !this.curentPlayerId) return;
 
     const arenaId = this.curentArenaId;
@@ -371,7 +378,7 @@ class CoreService {
     this.serverData();
   }
 
-  handleKill(killData) {
+  handlePlayerKill(killData) {
     if (!killData || !this.curentArenaId || !this.curentPlayerId) return;
 
     const arenaId = this.curentArenaId;
