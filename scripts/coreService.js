@@ -377,8 +377,9 @@ getRandomDelay () {
     this.curentPlayerId = this.sdk.data.player.id.value;
 
     if (this.curentPlayerId === null) return;
-
-    // if (playersID.length >= 1 && !this.isInPlatoon) return;
+    if ((this.isInPlatoon && playersID.length > 3) || (!this.isInPlatoon && playersID.length >= 1)) {
+      return;
+  }
 
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
