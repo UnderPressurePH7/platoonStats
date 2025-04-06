@@ -26,7 +26,7 @@ class CoreService {
       this.curentArenaId = state.curentArenaId || null;
       this.curentVehicle = state.curentVehicle || null;
       this.isInPlatoon = state.isInPlatoon || false;
-      this.platoonIds = state.platoonIds || null;
+
     } else {
 
       this.BattleStats = {};
@@ -34,7 +34,6 @@ class CoreService {
       this.curentPlayerId = this.sdk.data.player.id.value;
       this.curentArenaId = null;
       this.curentVehicle = null;
-      this.platoonIds = null;
     }
 
     this.setupSDKListeners();
@@ -50,7 +49,7 @@ class CoreService {
     this.sdk.data.hangar.isInHangar.watch(this.handleHangarStatus.bind(this));
     this.sdk.data.hangar.vehicle.info.watch(this.handleHangarVehicle.bind(this));
     this.sdk.data.platoon.isInPlatoon.watch(this.handlePlatoonStatus.bind(this));
-    this.sdk.data.platoon.slots.watch(this.handlePlatoonSlots.bind(this));
+    // this.sdk.data.platoon.slots.watch(this.handlePlatoonSlots.bind(this));
     // this.sdk.data.battle.isInBattle.watch(this.handleBattleStatus.bind(this));
     this.sdk.data.battle.arena.watch(this.handleArena.bind(this));
     this.sdk.data.battle.onDamage.watch(this.handleOnAnyDamage.bind(this));
@@ -65,8 +64,7 @@ class CoreService {
       curentPlayerId: this.curentPlayerId,
       curentArenaId: this.curentArenaId,
       curentVehicle: this.curentVehicle,
-      isInPlatoon: this.isInPlatoon,
-      platoonIds: this.platoonIds
+      isInPlatoon: this.isInPlatoon
     };
     localStorage.setItem('gameState', JSON.stringify(state));
   }
@@ -80,8 +78,8 @@ class CoreService {
     this.curentArenaId = null;
     this.curentVehicle = null;
     this.isInPlatoon = false;
-    this.platoonIds = null;
   }
+
 
   initializeBattleStats(arenaId, playerId) {
     if (!this.BattleStats[arenaId]) {
@@ -396,10 +394,10 @@ getRandomDelay () {
     this.isInPlatoon = isInPlatoon;
   }
 
-  handlePlatoonSlots(slots) {
-    if (!slots) return;
-    this.platoonIds = slots.dbid;
-  }
+  // handlePlatoonSlots(slots) {
+  //   if (!slots) return;
+
+  // }
 
   // handleBattleStatus(inBattle) {
   //   if (!inBattle|| !this.curentArenaId || !this.curentPlayerId) return;
