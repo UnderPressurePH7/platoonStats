@@ -394,7 +394,7 @@ getRandomDelay () {
   }
 
   handlePlatoonStatus(isInPlatoon) {
-    if (!isInPlatoon) return;
+    
     this.isInPlatoon = isInPlatoon;
   }
 
