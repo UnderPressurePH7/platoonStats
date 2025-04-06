@@ -52,7 +52,7 @@ class CoreService {
     this.sdk.data.platoon.slots.watch(this.handlePlatoonSlots.bind(this));
     this.sdk.data.battle.isInBattle.watch(this.handleBattleStatus.bind(this));
     this.sdk.data.battle.arena.watch(this.handleArena.bind(this));
-    this.sdk.data.battle.onDamage.watch(this.handleOnAnyDamage(this));
+    this.sdk.data.battle.onDamage.watch(this.handleOnAnyDamage.bind(this));
     this.sdk.data.battle.onPlayerFeedback.watch(this.handlePlayerFeedback.bind(this));
     this.sdk.data.battle.onBattleResult.watch(this.handleBattleResult.bind(this));
   }
@@ -375,7 +375,7 @@ class CoreService {
     }
   }
 
-  
+
 
   handlePlayerDamage(damageData) {
     if (!damageData || !this.curentArenaId || !this.curentPlayerId) return;
