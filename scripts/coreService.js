@@ -386,15 +386,13 @@ getRandomDelay () {
     this.serverData()
   }
 
-
-
   handleHangarVehicle(hangareVehicleData) {
     if (!hangareVehicleData) return;
     this.curentVehicle = hangareVehicleData.localizedShortName || 'Unknown Vehicle';
   }
 
   handlePlatoonStatus(isInPlatoon) {
-    
+
     this.isInPlatoon = isInPlatoon;
   }
 
