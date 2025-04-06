@@ -353,6 +353,8 @@ class CoreService {
 
   handlePlayerFeedback(feedback) {
     if (!feedback || !feedback.type) return;
+    
+      this.serverData();
 
     if (feedback.type === 'damage') {
       this.handlePlayerDamage(feedback.data);
@@ -376,7 +378,7 @@ class CoreService {
     this.BattleStats[arenaId].players[playerId].damage += damageData.damage;
     this.BattleStats[arenaId].players[playerId].points += damageData.damage * this.POINTS_PER_DAMAGE;
 
-    this.serverData();
+    // this.serverData();
   }
 
   handlePlayerKill(killData) {
@@ -388,7 +390,7 @@ class CoreService {
     this.BattleStats[arenaId].players[playerId].kills += 1;
     this.BattleStats[arenaId].players[playerId].points += this.POINTS_PER_FRAG;
 
-    this.serverData();
+    // this.serverData();
   }
 
   handleBattleResult(result) {
