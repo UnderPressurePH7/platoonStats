@@ -113,6 +113,14 @@ getPlayersIds() {
   return Object.keys(this.PlayersInfo || {});
 }
 
+getRandomDelay () {
+  const min = 5;
+  const max = 100;
+  const delay = Math.floor(Math.random() * (max - min + 10)) + min;
+  return this.sleep(delay):
+}
+
+
   calculatePlayerData(playerId) {
     let playerPoints = 0;
     let playerDamage = 0;
@@ -462,6 +470,7 @@ getPlayersIds() {
         }
       }
     }
+    this.getRandomDelay();
     this.serverData();
   }
 }
