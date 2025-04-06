@@ -110,7 +110,7 @@ class CoreService {
   }
 
   getPlayersIds() {
-    return Object.keys(this.PlayersInfo);
+    return Object.keys(this.PlayersInfo) || null;
   }
 
   compareArrays(arr1, arr2) {
