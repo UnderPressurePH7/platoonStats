@@ -368,6 +368,15 @@ getRandomDelay () {
   }
 
   // ОБРОБНИКИ ПОДІЙ В ГАРАЖІ
+
+  handlePlatoonStatus(isInPlatoon) {
+
+    this.isInPlatoon = isInPlatoon;
+    console.log("Platoon", isInPlatoon);
+    
+    this.saveState();
+  }
+
   handleHangarStatus(isInHangar) {
     if (!isInHangar) return;
 
@@ -375,6 +384,7 @@ getRandomDelay () {
     this.curentPlayerId = this.sdk.data.player.id.value;
 
     if (this.curentPlayerId === null) return;
+    console.log("Hangar - ", this.isInPlatoon);
     if ((this.isInPlatoon && playersID.length > 3) || (!this.isInPlatoon && playersID.length >= 1)) {
       return;
   }
@@ -389,10 +399,7 @@ getRandomDelay () {
     this.curentVehicle = hangareVehicleData.localizedShortName || 'Unknown Vehicle';
   }
 
-  handlePlatoonStatus(isInPlatoon) {
 
-    this.isInPlatoon = isInPlatoon;
-  }
 
   // handlePlatoonSlots(slots) {
   //   if (!slots) return;
