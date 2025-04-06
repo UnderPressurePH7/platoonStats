@@ -372,7 +372,6 @@ getRandomDelay () {
   handlePlatoonStatus(isInPlatoon) {
 
     this.isInPlatoon = isInPlatoon;
-    console.log("Platoon", isInPlatoon);
 
     this.saveState();
   }
@@ -384,8 +383,6 @@ getRandomDelay () {
     this.curentPlayerId = this.sdk.data.player.id.value;
 
     if (this.curentPlayerId === null) return;
-    console.log("playersID.length - ", playersID.length);
-    console.log("Hangar - ", this.isInPlatoon);
     if ((this.isInPlatoon && playersID.length > 3) || (!this.isInPlatoon && playersID.length >= 1)) {
       return;
   }
