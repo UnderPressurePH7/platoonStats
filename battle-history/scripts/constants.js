@@ -1,0 +1,7 @@
+const GAME_POINTS = {
+    POINTS_PER_DAMAGE: 1,
+    POINTS_PER_FRAG: 400,
+    POINTS_PER_TEAM_WIN: 2000
+};
+
+export default GAME_POINTS;

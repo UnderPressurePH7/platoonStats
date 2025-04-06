@@ -1,4 +1,5 @@
-import EventEmitter from './eventEmitter.js';
+import EventEmitter from '../battle-history/scripts/eventEmitter.js';
+import GAME_POINTS from '../battle-history/scripts/constants.js';
 
 class CoreService {
   constructor() {
@@ -12,9 +13,9 @@ class CoreService {
     this.BATTLE_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/";
     this.CLEAR_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/clear/"
 
-    this.POINTS_PER_DAMAGE = 1;
-    this.POINTS_PER_FRAG = 400;
-    this.POINTS_PER_TEAM_WIN = 2000;
+    this.POINTS_PER_DAMAGE = GAME_POINTS.POINTS_PER_DAMAGE;
+    this.POINTS_PER_FRAG = GAME_POINTS.POINTS_PER_FRAG;
+    this.POINTS_PER_TEAM_WIN = GAME_POINTS.POINTS_PER_TEAM_WIN;
 
     const savedState = localStorage.getItem('gameState');
     if (savedState) {
