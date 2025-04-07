@@ -349,10 +349,15 @@ class CoreService {
 
   // ПОДІЯ НА НАНЕСЕННЯ ШКОДИ В КОЛІ ВІДМАЛЬВКИ
   handleOnAnyDamage(onDamageData) {
-    if (!onDamageData || !this.curentArenaId || !this.curentPlayerId) return;
-    if (onDamageData.attacker.playerId === this.curentPlayerId) return;
+    if (!onDamageData || !this.curentArenaId || !this.sdk.data.player.id.value) return;
 
-    // this.serverDataLoad();
+    const playersID = this.getPlayersIds();
+    for (const playerId of playersID) {
+      if (onDamageData.attacker.playerId === playerId && playerId !== this.sdk.data.player.id.value) {
+        this.serverDataLoad();
+        break;
+      }
+    }
   }
 
   // ОБРОБНИКИ ПОДІЙ ПОВ'ЯЗАНИХ ІЗ ДІЯМИ ГРАВЦЯ
