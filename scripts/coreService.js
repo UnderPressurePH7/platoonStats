@@ -104,16 +104,16 @@ class CoreService {
     return this.PlayersInfo[id] || null;
   }
 
-getPlayersIds() {
-  return Object.keys(this.PlayersInfo || {});
-}
+  getPlayersIds() {
+    return Object.keys(this.PlayersInfo || {});
+  }
 
-getRandomDelay () {
-  const min = 50;
-  const max = 200;
-  const delay = Math.floor(Math.random() * (max - min + 10)) + min;
-  return this.sleep(delay);
-}
+  getRandomDelay() {
+    const min = 50;
+    const max = 200;
+    const delay = Math.floor(Math.random() * (max - min + 10)) + min;
+    return this.sleep(delay);
+  }
 
 
   calculatePlayerData(playerId) {
@@ -173,149 +173,88 @@ getRandomDelay () {
   async saveToServer(retries = 2) {
     const accessKey = this.getAccessKey();
     if (!accessKey) {
-        throw new Error('Access key not found');
+      throw new Error('Access key not found');
     }
 
     for (let i = 0; i < retries; i++) {
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-            const response = await fetch(`${atob(STATS.BATTLE)}${accessKey}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Player-ID': this.curentPlayerId
-                },
-                body: JSON.stringify({
-                    BattleStats: this.BattleStats,
-                    PlayerInfo: this.PlayersInfo,
-                }),
-                signal: controller.signal
-            });
+        const response = await fetch(`${atob(STATS.BATTLE)}${accessKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Player-ID': this.curentPlayerId
+          },
+          body: JSON.stringify({
+            BattleStats: this.BattleStats,
+            PlayerInfo: this.PlayersInfo,
+          }),
+          signal: controller.signal
+        });
 
-            clearTimeout(timeoutId);
+        clearTimeout(timeoutId);
 
-            if (!response.ok && response.status !== 202) {
-                throw new Error(`Server error: ${response.status}`);
-            }
-
-            await this.loadFromServer();
-            this.eventsCore.emit('statsUpdated');
-            this.saveState();
-            return true;
-
-        } catch (error) {
-            console.error(`Attempt ${i + 1} failed:`, error);
-            if (i === retries - 1) throw error;
-            await this.sleep(750 * (i + 1)); // Експоненціальна затримка
+        if (!response.ok && response.status !== 202) {
+          throw new Error(`Server error: ${response.status}`);
         }
+
+        await this.loadFromServer();
+        this.eventsCore.emit('statsUpdated');
+        this.saveState();
+        return true;
+
+      } catch (error) {
+        console.error(`Attempt ${i + 1} failed:`, error);
+        if (i === retries - 1) throw error;
+        await this.sleep(750 * (i + 1)); // Експоненціальна затримка
+      }
     }
     return false;
-}
+  }
 
-  // async saveToServer() {
-  //   try {
-  //     const response = await fetch(`${this.BATTLE_STATS_URL}${this.getAccessKey()}`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'X-Player-ID': this.curentPlayerId
-  //       },
-  //       body: JSON.stringify({
-  //         BattleStats: this.BattleStats,
-  //         PlayerInfo: this.PlayersInfo,
-  //       }),
-  //     });
-
-  //     if (!response.ok && response.status !== 202) {
-  //       throw new Error(`Помилка при збереженні даних: ${response.statusText}`);
-  //     }
-
-  //     await this.sleep(300);
-  //     await this.loadFromServer();
-
-  //     this.eventsCore.emit('statsUpdated');
-  //     this.saveState();
-
-  //     return true;
-  //   } catch (error) {
-  //     console.error('Error in serverData:', error);
-  //     return false;
-  //   }
-  // }
 
   async loadFromServer() {
     try {
       const accessKey = this.getAccessKey();
       if (!accessKey) {
-          throw new Error('Access key not found');
+        throw new Error('Access key not found');
       }
-        const response = await fetch(`${this.BATTLE_STATS_URL}${accessKey}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+      const response = await fetch(`${atob(STATS.BATTLE)}${accessKey}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-        if (!response.ok) {
-            throw new Error(`Помилка при завантаженні даних: ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`Помилка при завантаженні даних: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        if (data.BattleStats) {
+          this.BattleStats = data.BattleStats;
         }
-
-        const data = await response.json();
-
-        if (data.success) {
-            if (data.BattleStats) {
-                this.BattleStats = data.BattleStats;
-            }
-            if (data.PlayerInfo) {
-                this.PlayersInfo = data.PlayerInfo;
-            }
-            this.eventsCore.emit('statsUpdated');
+        if (data.PlayerInfo) {
+          this.PlayersInfo = data.PlayerInfo;
         }
-        return true;
+        this.eventsCore.emit('statsUpdated');
+      }
+      return true;
     } catch (error) {
-        console.error('Помилка при завантаженні даних із сервера:', error);
-        throw error;
+      console.error('Помилка при завантаженні даних із сервера:', error);
+      throw error;
     }
-}
+  }
 
-  // async loadFromServer() {
-  //   try {
-  //     const accessKey = this.getAccessKey();
-  //     const response = await fetch(`${this.BATTLE_STATS_URL}${accessKey}`, {
-  //       method: 'GET',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error(`Помилка при завантаженні даних: ${response.statusText}`);
-  //     }
-
-  //     const data = await response.json();
-
-  //     if (data.success) {
-  //       if (data.BattleStats) {
-  //         this.BattleStats = data.BattleStats;
-  //       }
-  //       if (data.PlayerInfo) {
-  //         this.PlayersInfo = data.PlayerInfo;
-  //       }
-  //       this.eventsCore.emit('statsUpdated');
-  //     }
-  //     return true;
-  //   } catch (error) {
-  //     console.error('Помилка при завантаженні даних із сервера:', error);
-  //     throw error;
-  //   }
-  // }
-
+  
   async clearServerData() {
     try {
       const accessKey = this.getAccessKey();
-      const response = await fetch(`${this.CLEAR_STATS_URL}${accessKey}`, {
+      const response = await fetch(`${atob(STATS.CLEAR)}${accessKey}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -382,7 +321,7 @@ getRandomDelay () {
     if (this.curentPlayerId === null) return;
     if ((this.isInPlatoon && playersID.length > 3) || (!this.isInPlatoon && playersID.length >= 1)) {
       return;
-  }
+    }
 
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
@@ -461,7 +400,7 @@ getRandomDelay () {
     const playerId = this.curentPlayerId;
 
     this.BattleStats[arenaId].players[playerId].damage += damageData.damage;
-    this.BattleStats[arenaId].players[playerId].points += damageData.damage *  GAME_POINTS.POINTS_PER_DAMAGE;
+    this.BattleStats[arenaId].players[playerId].points += damageData.damage * GAME_POINTS.POINTS_PER_DAMAGE;
 
     this.serverData();
   }
