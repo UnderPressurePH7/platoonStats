@@ -3,9 +3,8 @@ import { GAME_POINTS, STATS } from './constants.js';
 
 class BattleDataManager {
   constructor() {
-    this.BATTLE_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/";
-    this.IMPORT_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/import/";
-   
+
+
     const savedState = localStorage.getItem('gameState');
     if (savedState) {
       const state = JSON.parse(savedState);
@@ -50,7 +49,7 @@ class BattleDataManager {
     let battlePoints = 0;
     let battleDamage = 0;
     let battleKills = 0;
-    
+
     // Додаємо бонусні очки за перемогу команди
     if (battle.win === 1) {
       battlePoints += GAME_POINTS.POINTS_PER_TEAM_WIN;

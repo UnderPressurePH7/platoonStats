@@ -10,10 +10,6 @@ class CoreService {
       throw error;
     }
 
-    this.BATTLE_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/";
-    this.CLEAR_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/clear/"
-
-
     const savedState = localStorage.getItem('gameState');
     if (savedState) {
       const state = JSON.parse(savedState);
@@ -239,7 +235,7 @@ class CoreService {
         if (data.PlayerInfo) {
           this.PlayersInfo = data.PlayerInfo;
         }
-        
+
       }
       return true;
     } catch (error) {
