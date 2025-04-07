@@ -200,9 +200,7 @@ class CoreService {
           throw new Error(`Server error: ${response.status}`);
         }
 
-        await this.loadFromServer();
-        this.eventsCore.emit('statsUpdated');
-        this.saveState();
+
         return true;
 
       } catch (error) {
@@ -241,7 +239,7 @@ class CoreService {
         if (data.PlayerInfo) {
           this.PlayersInfo = data.PlayerInfo;
         }
-        this.eventsCore.emit('statsUpdated');
+        
       }
       return true;
     } catch (error) {
@@ -250,7 +248,7 @@ class CoreService {
     }
   }
 
-  
+
   async clearServerData() {
     try {
       const accessKey = this.getAccessKey();

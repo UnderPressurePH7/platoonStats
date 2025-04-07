@@ -106,7 +106,7 @@ class BattleDataManager {
 
     try {
       const accessKey = this.getAccessKey();
-      const response = await fetch(`${this.IMPORT_URL}${accessKey}`, {
+      const response = await fetch(`${atob(STATS.IMPORT)}${accessKey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -134,7 +134,10 @@ class BattleDataManager {
   async loadFromServer() {
     try {
       const accessKey = this.getAccessKey();
-      const response = await fetch(`${this.BATTLE_STATS_URL}${accessKey}`, {
+      if (!accessKey) {
+        throw new Error('Access key not found');
+      }
+      const response = await fetch(`${atob(STATS.BATTLE)}${accessKey}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -162,11 +165,12 @@ class BattleDataManager {
     }
   }
 
+
   async deleteBattle(battleId) {
 
     try {
       const accessKey = this.getAccessKey();
-      const response = await fetch(`${this.BATTLE_STATS_URL}${accessKey}\\${battleId}`, {
+      const response = await fetch(`${atob(STATS.BATTLE)}${accessKey}\\${battleId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
