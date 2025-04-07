@@ -436,6 +436,7 @@ class CoreService {
     const arenaId = result.arenaUniqueID;
     if (!arenaId) return;
 
+    console.log("result.avatars", Object.keys(result.avatars)[0]);
     this.curentPlayerId = Object.keys(result.avatars)[0];
     this.BattleStats[arenaId].duration = result.common.duration;
 
@@ -463,6 +464,7 @@ class CoreService {
             playerStats.damage = vehicle.damageDealt;
             playerStats.kills = vehicle.kills;
             playerStats.points = vehicle.damageDealt + (vehicle.kills * GAME_POINTS.POINTS_PER_FRAG);
+            this.saveState();
             // this.saveToServer(playerId); // помилка, сервер лягає
             break;
           }
