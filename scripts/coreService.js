@@ -1,5 +1,5 @@
 import EventEmitter from '../battle-history/scripts/eventEmitter.js';
-import GAME_POINTS from '../battle-history/scripts/constants.js';
+import { GAME_POINTS, STATS } from '../battle-history/scripts/constants.js';
 
 class CoreService {
   constructor() {
@@ -13,9 +13,6 @@ class CoreService {
     this.BATTLE_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/";
     this.CLEAR_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/clear/"
 
-    this.POINTS_PER_DAMAGE = GAME_POINTS.POINTS_PER_DAMAGE;
-    this.POINTS_PER_FRAG = GAME_POINTS.POINTS_PER_FRAG;
-    this.POINTS_PER_TEAM_WIN = GAME_POINTS.POINTS_PER_TEAM_WIN;
 
     const savedState = localStorage.getItem('gameState');
     if (savedState) {
@@ -151,7 +148,7 @@ getRandomDelay () {
       for (const arenaId in this.BattleStats) {
         battles++;
         if (this.BattleStats[arenaId].win === 1) {
-          teamPoints += this.POINTS_PER_TEAM_WIN;
+          teamPoints += GAME_POINTS.POINTS_PER_TEAM_WIN;
           wins++;
         }
 
@@ -184,7 +181,7 @@ getRandomDelay () {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-            const response = await fetch(`${this.BATTLE_STATS_URL}${accessKey}`, {
+            const response = await fetch(`${atob(STATS.BATTLE)}${accessKey}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -464,7 +461,7 @@ getRandomDelay () {
     const playerId = this.curentPlayerId;
 
     this.BattleStats[arenaId].players[playerId].damage += damageData.damage;
-    this.BattleStats[arenaId].players[playerId].points += damageData.damage * this.POINTS_PER_DAMAGE;
+    this.BattleStats[arenaId].players[playerId].points += damageData.damage *  GAME_POINTS.POINTS_PER_DAMAGE;
 
     this.serverData();
   }
@@ -476,7 +473,7 @@ getRandomDelay () {
     const playerId = this.curentPlayerId;
 
     this.BattleStats[arenaId].players[playerId].kills += 1;
-    this.BattleStats[arenaId].players[playerId].points += this.POINTS_PER_FRAG;
+    this.BattleStats[arenaId].players[playerId].points += GAME_POINTS.POINTS_PER_FRAG;
 
     this.serverData();
   }
@@ -543,7 +540,7 @@ getRandomDelay () {
             const playerStats = this.BattleStats[arenaId].players[playerId];
             playerStats.damage = vehicle.damageDealt;
             playerStats.kills = vehicle.kills;
-            playerStats.points = vehicle.damageDealt + (vehicle.kills * this.POINTS_PER_FRAG);
+            playerStats.points = vehicle.damageDealt + (vehicle.kills * GAME_POINTS.POINTS_PER_FRAG);
             // this.saveToServer(playerId); // помилка, сервер лягає
             break;
           }

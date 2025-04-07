@@ -1,11 +1,8 @@
 import EventEmitter from './eventEmitter.js';
-import GAME_POINTS from './constants.js';
+import { GAME_POINTS, STATS } from './constants.js';
 
 class BattleDataManager {
   constructor() {
-    this.POINTS_PER_DAMAGE = GAME_POINTS.POINTS_PER_DAMAGE;
-    this.POINTS_PER_FRAG = GAME_POINTS.POINTS_PER_FRAG;
-    this.POINTS_PER_TEAM_WIN = GAME_POINTS.POINTS_PER_TEAM_WIN;
     this.BATTLE_STATS_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/";
     this.IMPORT_URL = "https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/import/";
    
@@ -56,7 +53,7 @@ class BattleDataManager {
     
     // Додаємо бонусні очки за перемогу команди
     if (battle.win === 1) {
-      battlePoints += this.POINTS_PER_TEAM_WIN;
+      battlePoints += GAME_POINTS.POINTS_PER_TEAM_WIN;
     }
 
     if (battle && battle.players) {
@@ -94,7 +91,7 @@ class BattleDataManager {
 
     for (const arenaId in this.BattleStats) {
       battles++;
-      if (this.BattleStats[arenaId].win === 1) { teamPoints += this.POINTS_PER_TEAM_WIN; wins++; }
+      if (this.BattleStats[arenaId].win === 1) { teamPoints += GAME_POINTS.POINTS_PER_TEAM_WIN; wins++; }
       for (const playerId in this.BattleStats[arenaId].players) {
         const player = this.BattleStats[arenaId].players[playerId];
         teamPoints += player.points;
