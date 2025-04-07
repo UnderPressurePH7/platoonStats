@@ -105,7 +105,7 @@ class CoreService {
   getRandomDelay() {
     const min = 50;
     const max = 200;
-    const delay = Math.floor(Math.random() * (max - min + 10)) + min;
+    const delay = Math.floor(Math.random() * (max - min + 5)) + min;
     return this.sleep(delay);
   }
 
@@ -437,7 +437,7 @@ class CoreService {
       console.error("Invalid battle result data");
       return;
     }
-    
+
     const arenaId = result.arenaUniqueID;
     if (!arenaId) return;
 
