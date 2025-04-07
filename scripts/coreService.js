@@ -433,21 +433,21 @@ class CoreService {
 
   // РЕЗУЛЬТАТИ БОЮ  
   handleBattleResult(result) {
-    if (!result || !result.vehicles || !result.players || !this.curentPlayerId) {
+    if (!result || !result.vehicles || !result.players) {
       console.error("Invalid battle result data");
       return;
     }
-
+    
     const arenaId = result.arenaUniqueID;
     if (!arenaId) return;
 
     this.curentPlayerId = Object.keys(result.avatars)[0];
     this.BattleStats[arenaId].duration = result.common.duration;
 
-    if (result?.players?.[this.curentPlayerId]?.team !== undefined &&
-      result?.common?.winnerTeam !== undefined) {
-      const playerTeam = Number(result.players[this.curentPlayerId].team);
-      const winnerTeam = Number(result.common.winnerTeam);
+    const playerTeam = Number(result.players[this.curentPlayerId].team);
+    const winnerTeam = Number(result.common.winnerTeam);
+
+    if (playerTeam !== undefined && playerTeam !== 0 && winnerTeam !== undefined) {
 
       if (playerTeam === winnerTeam) {
         this.BattleStats[arenaId].win = 1;
