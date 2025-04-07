@@ -42,8 +42,6 @@ class CoreService {
     this.sdk.data.hangar.isInHangar.watch(this.handleHangarStatus.bind(this));
     this.sdk.data.hangar.vehicle.info.watch(this.handleHangarVehicle.bind(this));
     this.sdk.data.platoon.isInPlatoon.watch(this.handlePlatoonStatus.bind(this));
-    // this.sdk.data.platoon.slots.watch(this.handlePlatoonSlots.bind(this));
-    // this.sdk.data.battle.isInBattle.watch(this.handleBattleStatus.bind(this));
     this.sdk.data.battle.arena.watch(this.handleArena.bind(this));
     this.sdk.data.battle.onDamage.watch(this.handleOnAnyDamage.bind(this));
     this.sdk.data.battle.onPlayerFeedback.watch(this.handlePlayerFeedback.bind(this));
@@ -329,15 +327,6 @@ class CoreService {
 
 
 
-  // handlePlatoonSlots(slots) {
-  //   if (!slots) return;
-
-  // }
-
-  // handleBattleStatus(inBattle) {
-  //   if (!inBattle|| !this.curentArenaId || !this.curentPlayerId) return;
-
-  // }
 
   // ОБРОБНИК ПОДІЙ АРЕНИ
   handleArena(arenaData) {
